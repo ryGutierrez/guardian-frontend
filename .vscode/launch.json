@@ -1,0 +1,24 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\src\\sqltest.js",
+            // "env": {
+            //     "DB_USER": "CloudSAee21eeec",
+            //     "DB_PASSWORD": "group6Guardians!",
+            //     "DB_SERVER": "csumb-guardian.database.windows.net",
+            //     "DB_PORT": "1433",
+            //     "DB_NAME": "CSUMB_Guardian"
+            // }
+        }
+    ]
+}
