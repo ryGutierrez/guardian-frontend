@@ -59,9 +59,21 @@ export default function Stories() {
             </div>
         )
     }
+
     useEffect(() => {
-        console.log("Hello");
+        console.log("Stories component loaded...");
+        
+        // Server fetch example:
+        const fetchData = async() => {
+            const data = await fetch(new URL("http://localhost:3001/api"));
+            const json = await data.json();
+            console.log(json);
+            return json;
+        };
+        fetchData().catch(console.error);
+
       }, []);
+      
     return (
         <div className = "MainWindow">
             <StickyBox className = "SideProfile">
