@@ -1,0 +1,79 @@
+.innerSideProfile{
+    width:80%;
+    height:100%;
+    font-size: 24px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    font-family: Montserrat;
+}
+.profName{
+    display:flex;
+    height:25px;
+    align-items: center;
+}
+.zipSection{
+    margin-top: 10px;
+    display:grid;
+    grid-template-columns: 18% 82%;
+    grid-template-areas: 
+    "zip zipcode"
+}
+.zipSection > b{
+    justify-self: left;
+    grid-area: zip;
+    margin-bottom: 0;
+}
+.zipSection>.dropdown{
+    grid-area: zipcode;
+    display: flex;
+    justify-content: baseline;
+}
+.zipSection> .dropdown > button{
+    font-weight: bolder;
+    font-size: 24px;
+    color:black;
+    border: none;
+    background-color: white;
+    padding: 0 0 0 0;
+}
+.zipSection>.dropdown > button:hover{
+    color:black;
+    border:none;
+    background-color: white;;
+}
+.show>.btn-secondary.dropdown-toggle:focus {
+    box-shadow: white;
+}
+.show>.btn-secondary.dropdown-toggle  {
+    color:black;
+    border:none;
+    background-color: white;;
+}
+.watchingSection{
+    margin-top: 10px;
+    display:grid;
+    grid-template-columns: 18% 82%;
+    grid-template-areas: 
+    "font watching"
+    ". watchList"
+}
+.watchingSection > .font{
+    font-size: 27px;
+    justify-self: left;
+    grid-area: font;
+    color:#C79E34;
+}
+.watchingSection > b{
+    grid-area: watching;
+}
+.watchList{
+    margin-left: 16px;
+    border-left: 2px black solid;
+    grid-area: watchList;
+    padding-left: 5px;
+    display: flex;
+    flex-direction: column;
+}

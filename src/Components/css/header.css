@@ -1,0 +1,11 @@
+.header{
+    height:6vh;
+    background-color: black;
+    font-family: 'Squada One', cursive;
+}
+.header >b{
+    font-weight: 400;
+    font-size: 5.7vh;
+    color:white;
+
+}
