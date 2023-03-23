@@ -1,0 +1,50 @@
+.SideWindow{
+    width:95%;
+    font-size: 24px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.oldStory{
+    border-radius: 14px;
+    background-color: #020122;
+    display:grid;
+    grid-template-columns: 100%;
+    justify-content: center;
+    grid-template-areas: 
+    'date'
+    'details'
+    'link'
+}
+#date{
+    justify-self: center;
+    width:90%;
+    color:#909090;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: .5em;
+    margin-top: .5em;
+}
+.oldStoryDetails{
+    grid-area: details;
+    color:white;
+    background-color: #737ab098;
+    font-size: 15px;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+
+}
+.oldStoryDetails >p{
+    width:90%;
+}
+.oldStory > span{
+    justify-self: center;
+    width:93%;
+    color:#BCBABA;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: .5em;
+    margin-top: .5em;
+}

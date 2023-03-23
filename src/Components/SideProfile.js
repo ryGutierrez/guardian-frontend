@@ -3,10 +3,14 @@ import './css/sideprofile.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBinoculars} from '@fortawesome/free-solid-svg-icons'
 export default function SideProfile() {
+  function login(){
+
+  }
   return (
     <div className = "innerSideProfile">
       <div className="profName">
         <b>Derockenthis</b>
+        {/* {login()} */}
       </div>
       <div className="zipSection">
         <b>Zip</b>

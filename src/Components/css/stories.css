@@ -12,7 +12,8 @@
 .SideStories{
     height:50vh;
     width:30%;
-    border: 3px solid green
+    display: flex;
+    justify-content: center;
 }
 .MainContent{
     display: flex;
@@ -21,6 +22,7 @@
     height:250vh;
     width:40%;
     border-left: 2.2px solid black;
+    border-right: 2.2px solid black;
     /* border:3px solid blue; */
 }
 
@@ -93,8 +95,9 @@
     width:100%;
     border-radius: 18px;
     display: grid;
+    padding-top:.5em;
     grid-template-columns: auto;
-    grid-template-rows: 35% 65%;
+    grid-template-rows: 40px auto;
     grid-template-areas: 
     "header"
     "info"
@@ -125,7 +128,7 @@
     width:95%;
     display:grid;
     justify-self: center;
-    align-items: end;
+    align-items: center;
     grid-template-columns: auto;
     grid-template-rows: auto;
     grid-template-areas: 
@@ -151,7 +154,7 @@
 .story > .storyDT{
     grid-area:info;
     color: white;
-    height:90%;
+    margin-bottom: .5em;
     width:95%;
     display:grid;
     justify-self: center;
