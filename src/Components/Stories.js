@@ -41,14 +41,39 @@ export default function Stories() {
                 this.shortenedDetails=this.details.substring(0,150)+"...";
                 this.hideBtn = false
             }
+            if(tag == "fire"){
+                this.tag=faFire
+            }
+            else if(tag == "flood"){
+                this.tag=faHouseFloodWater
+            }
+            this.id = id
+            this.shortenedDetails = details
+            this.hideBtn = true
+            if(this.details.length>=150){
+                this.shortenedDetails=this.details.substring(0,150)+"...";
+                this.hideBtn = false
+            }
+            if(tag == "fire"){
+                this.tag=faFire
+            }
+            else if(tag == "flood"){
+                this.tag=faHouseFloodWater
+            }
+            this.id = id
+            this.shortenedDetails = details
+            this.hideBtn = true
+            if(this.details.length>=150){
+                this.shortenedDetails=this.details.substring(0,150)+"...";
+                this.hideBtn = false
+            }
         }
       }
     //test data
-    let example_story = new story("2/13/22","Clay Fire", "Command continues to release engines from the incident. This will be the final update unless conditions change.","fire",0)
-    let story2 = new story("2/20/23","Flood-La Paz","The NASA Global Flood Model has issued a Flood Warning on February 20, 2023, 02:33:00 UTC for La Paz, Baja Calif. This will be the final update unless conditions change NASA Global Flood Model has issued a Flood Warning on February 20","flood",1)
+    let example_story = new story("2/13/22","Clay Fire", "Command continues to release engines from the incident. This will be the final update unless conditions change.","fire")
+    let story2 = new story("2/20/23","Flood-La Paz","The NASA Global Flood Model has issued a Flood Warning on February 20, 2023, 02:33:00 UTC for La Paz, Baja Calif....","flood")
 
     const stories = [example_story,story2]
-    // setStories(stories)
     //Heres where it loads the stories onto the html
     //It gets the stories from the stories array
     //returnStories function is being used by the second return statement.
@@ -109,6 +134,9 @@ export default function Stories() {
     }
 
     useEffect(() => {
+        setStories(stories)
+        setCurr(stories[0])
+
         console.log("Stories component loaded...");
         
         // Server fetch example:
@@ -120,9 +148,8 @@ export default function Stories() {
         // };
         // fetchData().catch(console.error);
       
-        setStories(stories)
-        setCurr(stories[0])
       }, []);
+
     return (
         <div className = "MainWindow">
             <div className = "MainContent">
