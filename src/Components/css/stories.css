@@ -2,16 +2,10 @@
     display: flex;
     justify-content: center;
 }
-.SideProfile{
-    display: flex;
-    justify-content: center;
-    height:50vh;
-    width:30%;
-    /* border: 3px solid green */
-}
+
 .SideStories{
     height:50vh;
-    width:30%;
+    width:40%;
     display: flex;
     justify-content: center;
 }
@@ -20,7 +14,7 @@
     flex-direction: column;
     align-items: center;
     height:250vh;
-    width:40%;
+    width:60%;
     border-left: 2.2px solid black;
     border-right: 2.2px solid black;
     /* border:3px solid blue; */
@@ -165,11 +159,24 @@
     "details tag"
 }
 .storyDT > p{
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 500;
 }
 .storyDT >.icon{
     font-size: 27px;
     justify-self: center;
     color:orange;
+}
+#seeMore{
+    border:none;
+    background-color: transparent;
+    color:rgb(201, 201, 201);
+    font-size: 16px;
+    font-weight: 500;
+}
+#seeMore:hover{
+    color:rgba(122, 122, 223, 0.606)
+}
+#seeMore:focus{
+    outline: none;
 }

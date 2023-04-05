@@ -1,0 +1,54 @@
+.login{
+    margin-top: 1em;
+}
+.login>form{
+    display: flex;
+    flex-direction: column;
+}
+.login>form{
+    font-size:16px;
+}
+.login > form> input{
+    font-size: 18px;
+    border: none;
+    border-bottom: solid 2px black;
+    width:70%;
+    transition: all .15s linear;
+}
+.login > form> input:focus{
+    width:90%;
+    border:none;
+    border-bottom: solid 2px rgb(63, 119, 209);
+    outline:none;
+}
+
+.login > form> button{
+    margin-top:1em
+}
+#switchbtn{
+    color:white;
+    font-size: 13px;
+    font-weight: 600;
+    border:none;
+    background-color: #EF8354;
+    padding: 8px;
+    border: #EF8354;
+    border-radius: 21px;
+    width:70%;
+
+}
+#switchbtn:hover{
+    background-color: #c46a44;
+}
+
+#loginbtn{
+    color:white;
+    font-size: 13px;
+    font-weight: 600;
+    border:none;
+    background-color: #279AF1;
+    padding: 8px;
+    border: #279AF1;
+    border-radius: 21px;
+    width:40%
+}

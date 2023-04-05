@@ -2,11 +2,9 @@ import React from 'react'
 import './css/stories.css';
 import { useState,useEffect } from 'react'
 import StickyBox from "react-sticky-box";
-import SideProfile from './SideProfile';
 import SideStories from './SideStories';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater} from '@fortawesome/free-solid-svg-icons'
-import Longtext from './Longtext'
 export default function Stories() {
     const [storiesState, setStories] = useState([])
     const [currStory,setCurr] = useState([])
@@ -60,7 +58,7 @@ export default function Stories() {
                                 <p className="Date">Reported {s.date}</p>
                             </div>
                             <div className="storyDT">
-                                <p className="storydetails " id={s.id}>{s.shortenedDetails}<button hidden={s.hideBtn}><span key={s.title}onClick={()=>showMore(s.id,s)}>...see more</span></button></p>
+                                <p className="storydetails " id={s.id}>{s.shortenedDetails}<button id ="seeMore" hidden={s.hideBtn}><span key={s.title}onClick={()=>showMore(s.id,s)}>see more</span></button></p>
                                 <FontAwesomeIcon className="icon" icon={s.tag} />
                             </div>
                         </div>
@@ -84,9 +82,6 @@ export default function Stories() {
 
     return (
         <div className = "MainWindow">
-            <StickyBox className = "SideProfile">
-                <SideProfile/>
-            </StickyBox>
             <div className = "MainContent">
                 <div class = "searchbox">
                     <FontAwesomeIcon className="MagnifyingGlass" icon={faMagnifyingGlass} />
