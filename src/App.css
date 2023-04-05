@@ -22,3 +22,16 @@ body{
 .AppStories{
   width:75%;
 }
+.SideProfile{
+  display: flex;
+  justify-content: right;
+  height:60vh;
+  width:25%;
+  /* border: 3px solid green */
+}
+.AppContent{
+  display:flex
+}
+.AppStories{
+  width:75%;
+}
