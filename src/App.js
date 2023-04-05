@@ -22,7 +22,7 @@ function App() {
       <div className="AppContent">
         <StickyBox className = "SideProfile">
           <div className = "innerSideProfile">
-            checks if the form name is 'login' then presents the login page, if not then presents register.
+            {/* checks if the form name is 'login' then presents the login page, if not then presents register. */}
             {
               currentForm=="login"? <Login onFormSwitch={toggleForm}/> : <Register onFormSwitch={toggleForm}/>
             }

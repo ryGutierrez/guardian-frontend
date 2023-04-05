@@ -5,7 +5,7 @@ export const Register= (props) =>{
     const [pass,setPass] = useState('');
     const [name,setName] = useState('')
 
-    //this is where you would send the login to the backend.
+    //this is where you would send the register to the backend.
     const handleSubmit = (e) =>{
         e.preventDefault();
         console.log(email);

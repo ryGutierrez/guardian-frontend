@@ -3,7 +3,6 @@ import './css/login.css';
 export const Login= (props) =>{
     const [email,setEmail] = useState('');
     const [pass,setPass] = useState('');
-
     //this is where you would send the login to the backend.
     const handleSubmit = (e) =>{
         e.preventDefault();
