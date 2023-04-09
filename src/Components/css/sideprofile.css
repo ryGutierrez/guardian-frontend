@@ -31,6 +31,13 @@
     display: flex;
     justify-content: baseline;
 }
+/* .dropdown-menu{
+    display: flex;
+    flex-direction: column;
+} */
+.dropdown-item{
+    align-self: center;
+}
 .zipSection> .dropdown > button{
     font-weight: bolder;
     font-size: 24px;
@@ -45,12 +52,16 @@
     background-color: white;;
 }
 .show>.btn-secondary.dropdown-toggle:focus {
-    box-shadow: white;
+    background-color: none;
 }
 .show>.btn-secondary.dropdown-toggle  {
     color:black;
     border:none;
     background-color: white;;
+}
+#newZip{
+    width:70%;
+    align-self: center;
 }
 .watchingSection{
     margin-top: 10px;

@@ -66,6 +66,21 @@
 .homeselection > button:hover{
     background-color:rgb(51, 51, 51)
 }
+.homeselection>button:focus{
+    outline: none;
+}
+#Latest-active{
+    background-color: white;
+    color:black;
+}
+#Popular-active{
+    background-color: white;
+    color:black;
+}
+#Mine-active{
+    background-color: white;
+    color:black;
+}
 
 .storysection{
     margin-top: 4vh;
@@ -99,21 +114,29 @@
 }
 .storycontainer > .interactions{
     color:white;
-    font-size: 15px;
+    font-size: 19px;
     padding: 1px;
     /* height:15px; */
     width:100%;
     display: flex;
     justify-content: center;
 }
-.interactions > .comment{
+.interactions > .action{
     display:flex;
     justify-content: center;
     align-items: center;
     width:33%
 }
-.comment >p{
-    margin: 0 0 0 0;
+.action>*{
+    pointer-events: none;
+    cursor: default;
+}
+.action > p{
+    margin-bottom: 0;
+    margin-left: 1em;
+}
+#watching-inter{
+    color:#C79E34
 }
 .story > .storyTD{
     grid-area:header;
