@@ -4,10 +4,23 @@ import { useState,useEffect } from 'react'
 import StickyBox from "react-sticky-box";
 import SideStories from './SideStories';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater} from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare} from '@fortawesome/free-solid-svg-icons'
 export default function Stories() {
     const [storiesState, setStories] = useState([])
     const [currStory,setCurr] = useState([])
+    const [currTab,setTab] = useState("Popular")
+
+     //Story Tabs {Latest, Popular, Mine}
+
+    //Latest backend query goes in this function 
+    function TabSwitch(e){
+        e.preventDefault()
+        console.log(currTab)
+        document.getElementById(currTab+"-active").id = currTab
+        setTab(e.target.getAttribute("id"))
+        document.getElementById(e.target.getAttribute("id")).id = e.target.getAttribute("id")+"-active"
+    }
+    
     //story class
     class story {
         constructor(date,title,details,tag,id) {
@@ -45,6 +58,18 @@ export default function Stories() {
             document.getElementById(id).innerHTML= s.details;
             setCurr(s)
         }
+        function interaction(e,id){
+            e.preventDefault()
+            console.log(e.target.getAttribute('id'))
+            // e.target.getAttribute('id')
+            if(e.target.id == "watching-inter"){
+                e.target.id = "watching"
+            }
+            else{
+                e.target.id = "watching-inter"
+            }
+            
+        }
         return(
             <div className="storysection">
                 {
@@ -63,8 +88,16 @@ export default function Stories() {
                             </div>
                         </div>
                         <div className="interactions">
-                            <div className="comment">
-                                <FontAwesomeIcon className="icon" icon={faComment} />
+                            <div id = {"comment"+s.id} className="action">
+                                <FontAwesomeIcon className="icon" icon={faComment}/>
+                                <p>1289</p>
+                            </div>
+                            <div id = {"watching"+s.id} className="action" onClick={(e)=>interaction(e,s.id)}>
+                                <FontAwesomeIcon className="icon" icon={faBinoculars} />
+                                <p>1289</p>
+                            </div>
+                            <div id = "share" className = "action">
+                                <FontAwesomeIcon icon={faShare} />
                                 <p>1289</p>
                             </div>
                         </div>
@@ -98,13 +131,13 @@ export default function Stories() {
                     <input type = "text" placeholder='Search'></input>
                 </div>
                 <div className="homeselection">
-                    <button>
+                    <button id = "Latest" onClick={(e)=>TabSwitch(e)}>
                         Latest
                     </button>
-                    <button>
+                    <button id = "Popular-active" onClick={(e)=>TabSwitch(e)}>
                         Popular
                     </button>
-                    <button>
+                    <button id = "Mine" onClick={(e)=>TabSwitch(e)}>
                         Mine
                     </button>
                 </div>

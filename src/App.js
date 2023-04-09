@@ -6,7 +6,7 @@ import Header from './Components/Header';
 import { Login } from './Components/Login';
 import { Register } from './Components/Register';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBinoculars} from '@fortawesome/free-solid-svg-icons'
+import { faBinoculars, faCirclePlus} from '@fortawesome/free-solid-svg-icons'
 import StickyBox from "react-sticky-box";
 function App() {
 
