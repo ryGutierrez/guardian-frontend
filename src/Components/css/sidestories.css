@@ -4,7 +4,7 @@
     font-weight: 500;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    margin-top: 2.5em;
 }
 .oldStory{
     border-radius: 14px;

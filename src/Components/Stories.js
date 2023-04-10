@@ -3,8 +3,10 @@ import './css/stories.css';
 import { useState,useEffect } from 'react'
 import StickyBox from "react-sticky-box";
 import SideStories from './SideStories';
+import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare} from '@fortawesome/free-solid-svg-icons'
+import moment from "moment"
 export default function Stories() {
     const [storiesState, setStories] = useState([])
     const [currStory,setCurr] = useState([])
@@ -13,12 +15,28 @@ export default function Stories() {
      //Story Tabs {Latest, Popular, Mine}
 
     //Latest backend query goes in this function 
-    function TabSwitch(e){
+    const TabSwitch = async (e) =>{
         e.preventDefault()
         console.log(currTab)
         document.getElementById(currTab+"-active").id = currTab
         setTab(e.target.getAttribute("id"))
         document.getElementById(e.target.getAttribute("id")).id = e.target.getAttribute("id")+"-active"
+
+        axios.get('http://localhost:3001/'+currTab)
+        .then((response) => {
+           let stories = []
+           for(let i = 0; i<response.data.length;i++){
+            let s = response.data[i]
+            s.date=moment(s.date).utc().format('YYYY-MM-DD')
+            stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
+            // console.log(response.data[i].details)
+           }
+           setStories(stories);
+           console.log(response.data)
+        })
+        .catch((err) => {
+           console.log(err);
+        });
     }
     
     //story class
@@ -168,7 +186,7 @@ export default function Stories() {
                         Mine
                     </button>
                 </div>
-                {returnStories(stories)}
+                {returnStories(storiesState)}
             </div>
             <StickyBox className = "SideStories">
                 <SideStories story={currStory}/>
