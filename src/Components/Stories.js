@@ -87,11 +87,7 @@ export default function Stories() {
             }
         }
       }
-    //test data
-    let example_story = new story("2/13/22","Clay Fire", "Command continues to release engines from the incident. This will be the final update unless conditions change.","fire")
-    let story2 = new story("2/20/23","Flood-La Paz","The NASA Global Flood Model has issued a Flood Warning on February 20, 2023, 02:33:00 UTC for La Paz, Baja Calif....","flood")
 
-    const stories = [example_story,story2]
     //Heres where it loads the stories onto the html
     //It gets the stories from the stories array
     //returnStories function is being used by the second return statement.
@@ -152,8 +148,6 @@ export default function Stories() {
     }
 
     useEffect(() => {
-        setStories(stories)
-        setCurr(stories[0])
         axios.get('http://localhost:3001/'+currTab)
         .then((response) => {
            let stories = []
@@ -163,6 +157,7 @@ export default function Stories() {
             stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
             // console.log(response.data[i].details)
            }
+           setCurr(stories[0])
            setStories(stories);
            console.log(response.data)
         })
