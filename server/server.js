@@ -44,6 +44,11 @@ app.get("/popular", async (req, res) => {
     console.log(result.recordset)
     res.send(result.recordset);
 });
+app.get("/latest", async (req, res) => {
+    let result = await sql.query`SELECT * FROM Incidents ORDER BY incidentID DESC`;
+    console.log(result.recordset)
+    res.send(result.recordset);
+});
 
 // Create new user with username, email, and password if details don't already exist
 app.post('/signup', async (req, res) => {

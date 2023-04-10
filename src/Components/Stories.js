@@ -22,21 +22,21 @@ export default function Stories() {
         setTab(e.target.getAttribute("id"))
         document.getElementById(e.target.getAttribute("id")).id = e.target.getAttribute("id")+"-active"
 
-        axios.get('http://localhost:3001/'+currTab)
-        .then((response) => {
-           let stories = []
-           for(let i = 0; i<response.data.length;i++){
-            let s = response.data[i]
-            s.date=moment(s.date).utc().format('YYYY-MM-DD')
-            stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
-            // console.log(response.data[i].details)
-           }
-           setStories(stories);
-           console.log(response.data)
-        })
-        .catch((err) => {
-           console.log(err);
-        });
+        // axios.get('http://localhost:3001/'+currTab)
+        // .then((response) => {
+        //    let stories = []
+        //    for(let i = 0; i<response.data.length;i++){
+        //     let s = response.data[i]
+        //     s.date=moment(s.date).utc().format('YYYY-MM-DD')
+        //     stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
+        //     // console.log(response.data[i].details)
+        //    }
+        //    setStories(stories);
+        //    console.log(response.data)
+        // })
+        // .catch((err) => {
+        //    console.log(err);
+        // });
     }
     
     //story class
@@ -154,7 +154,18 @@ export default function Stories() {
     useEffect(() => {
         setStories(stories)
         setCurr(stories[0])
-
+        axios.get('http://localhost:3001/'+currTab)
+        .then((response) => {
+           let stories = []
+           for(let i = 0; i<response.data.length;i++){
+            let s = response.data[i]
+            s.date=moment(s.date).utc().format('YYYY-MM-DD')
+            stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
+            // console.log(response.data[i].details)
+           }
+           setStories(stories);
+           console.log(response.data)
+        })
         console.log("Stories component loaded...");
         
         // Server fetch example:
@@ -166,7 +177,7 @@ export default function Stories() {
         // };
         // fetchData().catch(console.error);
       
-      }, []);
+      }, [currTab]);
 
     return (
         <div className = "MainWindow">
