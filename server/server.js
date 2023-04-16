@@ -49,7 +49,23 @@ app.get("/latest", async (req, res) => {
     console.log(result.recordset)
     res.send(result.recordset);
 });
+app.get("/getwatchlist/:id", async (req, res) => {
+    console.log(req.params.id)
+    let result = await sql.query`SELECT IncidentId FROM Watching WHERE UserId = ${req.params.id}`;
 
+    res.send(result.recordset);
+});
+app.post('/removewatching', async (req, res) => {
+    console.log(req.body.username)
+    let result = await sql.query`DELETE FROM Watching WHERE UserId = ${req.body.userID} AND incidentId=${req.body.storyID}`;
+    console.log(result,"removewatching")
+});
+//add story to user watchlist
+app.post('/watching', async (req, res) => {
+    console.log(req.body.username)
+    let result = await sql.query`insert into Watching (UserId, incidentId) values (${req.body.userID}, ${req.body.storyID})`;
+    console.log(result,"watching")
+});
 // Create new user with username, email, and password if details don't already exist
 app.post('/signup', async (req, res) => {
     let result = await sql.query`select count(*) from Users where username=${req.body.username} or email=${req.body.email}`;
@@ -69,7 +85,7 @@ app.post('/signup', async (req, res) => {
 
 // Compare hashes for login success
 app.post('/login', async (req, res) => {
-    let result = await sql.query`select * from Users where email=${req.body.email}`;
+    let result = await sql.query`select * from Users where username=${req.body.username}`;
     if(result.rowsAffected == 0) { // no matching email
         res.status(400).send({status: 'failure', message: 'No matching email'})
         return;
@@ -79,7 +95,9 @@ app.post('/login', async (req, res) => {
         res.status(400).send({status: 'failure', message: 'Password mismatch'});
         return;
     }
-    res.status(200).send({status: 'success', message: 'Login successful'});
+    res.status(200).send({status: 'success', message: 'Login successful', user: result.recordset[0]});
+    console.log(result.recordset[0])
+
     
 });
 

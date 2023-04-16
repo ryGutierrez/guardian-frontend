@@ -1,0 +1,19 @@
+.LoggedIn{
+    display:flex;
+    flex-direction: column;
+}
+#username{
+    margin-bottom: 0.5em;
+}
+.LoggedIn>button{
+    color:white;
+    font-size: 17px;
+    font-weight: 600;
+    border:none;
+    background-color: black;
+    padding: 8px;
+    border: black;
+    border-radius: 21px;
+    width:30%;
+    margin-bottom: 0.5em;
+}

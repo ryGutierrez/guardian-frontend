@@ -2,7 +2,7 @@ import React,{useState} from 'react'
 import './css/login.css';
 
 export const Login= (props) =>{
-    const [email,setEmail] = useState('');
+    const [username,setUsername] = useState('');
     const [pass,setPass] = useState('');
 
 
@@ -15,17 +15,23 @@ export const Login= (props) =>{
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: email,
+            username: username,
             password: pass,
           }),
         });
-        console.log(response); // use await response.json() to extract detailed messages from response
+        const data = await response.json(); // use await response.json() to extract detailed messages from response
+        console.log(data.user.userID)
+        if(response.status===200){
+          localStorage.setItem('user', username)
+          localStorage.setItem('userID',data.user.userID)
+          props.onFormSwitch(username)
+        }
     }
   return (
     <div className = "login">
       <form onSubmit = {handleSubmit}> 
-        <label htmlFor="email">Email</label>
-        <input value = {email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder='email@gmail.com' id="email" name = "email"></input>
+        <label htmlFor="username">Username</label>
+        <input value = {username} onChange={(e) => setUsername(e.target.value)} type="username" placeholder='username' id="username" name = "username"></input>
 
         <label htmlFor="password">Password</label>
         <input value = {pass} onChange={(e) => setPass(e.target.value)} type="password" placeholder='*********' id = "password" name = "password"></input>

@@ -20,7 +20,9 @@ export const Register= (props) =>{
             password: pass,
           }),
         });
+        //persistant login for the user.
         console.log(await response.json());
+        props.onFormSwitch('login')
     }
   return (
     <div className = "register">

@@ -7,14 +7,39 @@ import { Login } from './Components/Login';
 import { Register } from './Components/Register';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBinoculars, faCirclePlus} from '@fortawesome/free-solid-svg-icons'
+import {Loggedin} from './Components/Loggedin'
 import StickyBox from "react-sticky-box";
+import axios from 'axios';
 function App() {
 
   //this is how it switches forms from login to signup
   const [currentForm, setCurrentForm] = useState('login')
-
   const toggleForm = (formName) =>{
+    console.log(formName)
     setCurrentForm(formName)
+  }
+  const getWatchList=(id)=>{
+    axios.get('http://localhost:3001/getWatchlist/'+id)
+    .then((response) => {
+      console.log(response.data)
+      localStorage.setItem("watchlist",response.data)
+    })
+  }
+  const currentUserDisplay = () =>{
+    console.log(currentForm)
+    if(localStorage.getItem('user')){
+      getWatchList(localStorage.getItem('userID'))
+      return <Loggedin userName = {localStorage.getItem('user')} onFormSwitch={toggleForm}/>
+    }
+    if(currentForm==="login"){
+      return <Login onFormSwitch={toggleForm}/>
+    }
+    else if(currentForm==="register"){
+      return <Register onFormSwitch={toggleForm}/>
+    }
+    else{
+      return <Loggedin userName = {currentForm} onFormSwitch={toggleForm}/>
+    }
   }
   return (
     <div className="App">
@@ -24,7 +49,7 @@ function App() {
           <div className = "innerSideProfile">
             {/* checks if the form name is 'login' then presents the login page, if not then presents register. */}
             {
-              currentForm==="login"? <Login onFormSwitch={toggleForm}/> : <Register onFormSwitch={toggleForm}/>
+              currentUserDisplay()
             }
             <div className="zipSection">
               <b>Zip</b>
@@ -44,8 +69,6 @@ function App() {
                 </div>
                 <b>Watching</b>
                 <div className = "watchList">
-                  <a>clay</a>
-                  <a>clay</a>
                 </div>
               </div>
           </div>

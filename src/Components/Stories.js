@@ -21,31 +21,16 @@ export default function Stories() {
         document.getElementById(currTab+"-active").id = currTab
         setTab(e.target.getAttribute("id"))
         document.getElementById(e.target.getAttribute("id")).id = e.target.getAttribute("id")+"-active"
-
-        // axios.get('http://localhost:3001/'+currTab)
-        // .then((response) => {
-        //    let stories = []
-        //    for(let i = 0; i<response.data.length;i++){
-        //     let s = response.data[i]
-        //     s.date=moment(s.date).utc().format('YYYY-MM-DD')
-        //     stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
-        //     // console.log(response.data[i].details)
-        //    }
-        //    setStories(stories);
-        //    console.log(response.data)
-        // })
-        // .catch((err) => {
-        //    console.log(err);
-        // });
     }
     
     //story class
     class story {
-        constructor(date,title,details,tag,id) {
+        constructor(date,title,details,tag,id,watching) {
             this.date = date
             this.title = title
             this.details = details
             this.tag = tag
+            this.watching = watching
             if(tag === "fire"){
                 this.tag=faFire
             }
@@ -97,15 +82,37 @@ export default function Stories() {
             document.getElementById(id).innerHTML= s.details;
             setCurr(s)
         }
-        function interaction(e,id){
+        const interaction= async (e,id)=>{
             e.preventDefault()
             console.log(e.target.getAttribute('id'))
             // e.target.getAttribute('id')
-            if(e.target.id == "watching-inter"){
+            if(e.target.id === "watching-inter"){
                 e.target.id = "watching"
+                console.log("REMOVE WATCHING",localStorage.getItem("user"))
+                let response = await fetch('http://localhost:3001/removewatching', { // send username and incident id through POST body.
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  storyID: id,
+                  userID:localStorage.getItem('userID')
+                }),
+              });
             }
             else{
                 e.target.id = "watching-inter"
+                console.log("WATCHING",localStorage.getItem("user"))
+                let response = await fetch('http://localhost:3001/watching', { // send username and incident id through POST body.
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  storyID: id,
+                  userID:localStorage.getItem('userID')
+                }),
+              });
             }
             
         }
@@ -115,7 +122,7 @@ export default function Stories() {
                     
                     //gets the stories from the array and maps each one onto the html page like this.
                     story.map(s =>
-                    <div className="storycontainer" key={s.title}>
+                    <div className="storycontainer" key={s.id}>
                         <div className="story">
                             <div className="storyTD">
                                 <p className="Title">{s.title}</p>
@@ -147,6 +154,9 @@ export default function Stories() {
         )
     }
 
+    // const isWatching = (id) =>{
+
+    // }
     useEffect(() => {
         axios.get('http://localhost:3001/'+currTab)
         .then((response) => {
@@ -154,7 +164,7 @@ export default function Stories() {
            for(let i = 0; i<response.data.length;i++){
             let s = response.data[i]
             s.date=moment(s.date).utc().format('YYYY-MM-DD')
-            stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID))
+            stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
             // console.log(response.data[i].details)
            }
            setCurr(stories[0])
@@ -163,14 +173,6 @@ export default function Stories() {
         })
         console.log("Stories component loaded...");
         
-        // Server fetch example:
-        // const fetchData = async() => {
-        //     const data = await fetch(new URL("http://localhost:3001/ping"));
-        //     const json = await data.json();
-        //     console.log(json);
-        //     return json;
-        // };
-        // fetchData().catch(console.error);
       
       }, [currTab]);
 
