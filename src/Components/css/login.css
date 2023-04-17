@@ -52,3 +52,6 @@
     border-radius: 21px;
     width:40%
 }
+#loginbtn:hover{
+    background-color: #2382ca;
+}

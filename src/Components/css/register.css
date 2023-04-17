@@ -52,3 +52,6 @@
     border-radius: 21px;
     width:40%
 }
+#registerbtn:hover{
+    background-color: #2382ca;
+}

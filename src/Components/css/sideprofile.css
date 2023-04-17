@@ -14,19 +14,19 @@
     height:25px;
     align-items: center;
 }
-.zipSection{
+.countySection{
     margin-top: 10px;
-    display:grid;
+    /* display:grid; */
     grid-template-columns: 18% 82%;
     grid-template-areas: 
     "zip zipcode"
 }
-.zipSection > b{
+.countySection > b{
     justify-self: left;
     grid-area: zip;
     margin-bottom: 0;
 }
-.zipSection>.dropdown{
+.countySection>.dropdown{
     grid-area: zipcode;
     display: flex;
     justify-content: baseline;
@@ -38,7 +38,7 @@
 .dropdown-item{
     align-self: center;
 }
-.zipSection> .dropdown > button{
+.countySection> .dropdown > button{
     font-weight: bolder;
     font-size: 24px;
     color:black;
@@ -46,7 +46,7 @@
     background-color: white;
     padding: 0 0 0 0;
 }
-.zipSection>.dropdown > button:hover{
+.countySection>.dropdown > button:hover{
     color:black;
     border:none;
     background-color: white;;
@@ -87,4 +87,83 @@
     padding-left: 5px;
     display: flex;
     flex-direction: column;
+}
+#saveCountyBtn{
+    color:white;
+    font-size: 13px;
+    font-weight: 600;
+    border:none;
+    background-color: #EF8354;
+    padding: 8px;
+    border: #EF8354;
+    border-radius: 21px;
+    width:70%;
+
+}
+#saveCountyBtn:hover{
+    background-color: #c46a44;
+}
+.modalButtons {
+    display: flex;
+    position: absolute;
+    bottom: 10px;
+    margin: 0 auto;
+}
+
+.saveCountiesBtn {
+    color:white;
+    font-size: 13px;
+    font-weight: 600;
+    border:none;
+    background-color: #279AF1;
+    padding: 8px;
+    border: #279AF1;
+    border-radius: 21px;
+    margin: 5px;
+}
+
+.saveCountiesBtn:hover {
+    background-color: #217abe;
+}
+
+.saveCountyBtn {
+    padding: 2px 5px 2px 5px;
+    margin: 5px;
+    background-color: rgb(238, 238, 238);
+    border: 1px solid black;
+    border-radius: 5px 5px 5px;
+}
+.saveCountyBtn:hover {
+    background-color: rgb(218, 218, 218);
+}
+.countyItem {
+    padding: 5px;
+    border-radius: 5px 5px;
+    border: 1px solid black;
+    margin: 5px;
+    background-color: rgb(238, 238, 238);
+}
+.cancelCountyBtn {
+    background: none;
+    color: inherit;
+    border: none;
+    padding-left: 5px;
+    margin-left: 5px;
+    border-left: 1px solid black;
+}
+.cancelCountyXmark:hover {
+    color: rgb(218, 0, 0);
+}
+.countyInput {
+    padding: 2px;
+}
+.countyInputBlock {
+    margin: 0px 10px 10px 10px;
+}
+.countiesList {
+    display: flex;
+    flex-wrap: wrap;
+}
+.countyInputLabel {
+    margin-left: 10px;
 }

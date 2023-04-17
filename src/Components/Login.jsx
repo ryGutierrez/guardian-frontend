@@ -25,6 +25,7 @@ export const Login= (props) =>{
           localStorage.setItem('user', username)
           localStorage.setItem('userID',data.user.userID)
           props.onFormSwitch(username)
+          window.location.reload();
         }
     }
   return (
