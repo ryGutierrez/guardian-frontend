@@ -4,10 +4,10 @@ import './css/loggedin.css';
 export const Loggedin= (props) =>{
   
   const LogOut =()=>{
-    console.log("logOut");
-    props.onFormSwitch('login');
-    localStorage.clear();
-    window.location.reload();
+    console.log("logOUt")
+    localStorage.removeItem('user')
+    props.onFormSwitch('login')
+    localStorage.removeItem("watchlist")
   }
   return (
     <div className="LoggedIn">
