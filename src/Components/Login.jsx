@@ -9,7 +9,7 @@ export const Login= (props) =>{
     //this is where you would send the login to the backend.
     const handleSubmit = async (e) =>{
         e.preventDefault();
-        let response = await fetch('http://localhost:3001/login', { // responds 200 OK if login successful, otherwise 400 error
+        let response = await fetch('/login', { // responds 200 OK if login successful, otherwise 400 error
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

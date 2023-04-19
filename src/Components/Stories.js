@@ -89,7 +89,7 @@ export default function Stories() {
             if(e.target.id === "watching-inter"){
                 e.target.id = "watching"
                 console.log("REMOVE WATCHING",localStorage.getItem("user"))
-                let response = await fetch('http://localhost:3001/removewatching', { // send username and incident id through POST body.
+                let response = await fetch('/removewatching', { // send username and incident id through POST body.
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default function Stories() {
             else{
                 e.target.id = "watching-inter"
                 console.log("WATCHING",localStorage.getItem("user"))
-                let response = await fetch('http://localhost:3001/watching', { // send username and incident id through POST body.
+                let response = await fetch('/watching', { // send username and incident id through POST body.
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ export default function Stories() {
 
     // }
     useEffect(() => {
-        axios.get('http://localhost:3001/'+currTab)
+        axios.get('/'+currTab)
         .then((response) => {
            let stories = []
            for(let i = 0; i<response.data.length;i++){

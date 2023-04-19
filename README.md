@@ -18,3 +18,6 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
     ### `npm run server`
     Starts the server without the React application.
+
+    ### `npm run dev`
+    Starts the server as a proxy and the react application with concurrently

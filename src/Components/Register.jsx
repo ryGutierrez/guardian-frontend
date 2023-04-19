@@ -9,7 +9,7 @@ export const Register= (props) =>{
     //this is where you would send the register to the backend.
     const handleSubmit = async (e) =>{
         e.preventDefault();
-        let response = await fetch('http://localhost:3001/signup', { // send username, email, and plaintext password through POST body to be encrypted server-side
+        let response = await fetch('/signup', { // send username, email, and plaintext password through POST body to be encrypted server-side
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

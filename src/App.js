@@ -31,7 +31,7 @@ function App() {
   }
 
   const getWatchList=(id)=>{
-    axios.get('http://localhost:3001/getWatchlist/'+id)
+    axios.get('/getWatchlist/'+id)
     .then((response) => {
       // console.log(response.data)
       localStorage.setItem("watchlist",response.data)
@@ -43,7 +43,7 @@ function App() {
   }
 
   const getUserCounties = async (userId) => {
-    let raw = await fetch(`http://localhost:3001/userCounties/${userId}`);
+    let raw = await fetch(`/userCounties/${userId}`);
     let res = await raw.json();
     res = res.map(c => c.name);
     // console.log('saved counties: ', res);
@@ -65,7 +65,7 @@ function App() {
     }
 
     // update saved counties with new county
-    await fetch('http://localhost:3001/saveCounty', {
+    await fetch('/saveCounty', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function App() {
   };
 
   const deleteCounty = async (county) => {
-    await fetch(`http://localhost:3001/deleteCounty/${localStorage.getItem('userID')}/${county}`);
+    await fetch(`/deleteCounty/${localStorage.getItem('userID')}/${county}`);
     setUserCounties(userCounties.filter(c => c !== county));
     console.log(`Removed ${county}`);
   }
