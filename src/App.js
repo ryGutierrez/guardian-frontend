@@ -1,4 +1,4 @@
-import React,{useRef, useState} from 'react'
+import React,{useEffect, useRef, useState} from 'react'
 import './App.css';
 import './Components/css/sideprofile.css'
 import Stories from './Components/Stories';
@@ -19,8 +19,14 @@ function App() {
   const [currentForm, setCurrentForm] = useState('login')
   const [showModal, setShowModal] = useState(false);
   const [currCounty, setCurrCounty] = useState(null);
-  const [userCounties, setUserCounties] = useState(JSON.parse(localStorage.getItem('counties')));
-
+  const [userCounties, setUserCounties] = useState([]);
+  useEffect(()=>{
+    if(currentForm!=="login" || currentForm!=='register'){
+      console.log("UseEffect")
+      setUserCounties(JSON.parse(localStorage.getItem('counties')))
+      console.log(userCounties)
+    }
+  },[currentForm])
   // Reference variables
   const inputRef = useRef();
 
@@ -28,6 +34,7 @@ function App() {
   const toggleForm = (formName) =>{
     console.log(formName)
     setCurrentForm(formName)
+    window.location.reload()
   }
 
   const getWatchList=(id)=>{
@@ -42,13 +49,13 @@ function App() {
     setShowModal(!showModal);
   }
 
-  const getUserCounties = async (userId) => {
-    let raw = await fetch(`/userCounties/${userId}`);
-    let res = await raw.json();
-    res = res.map(c => c.name);
-    // console.log('saved counties: ', res);
-    localStorage.setItem('counties', JSON.stringify(res));
-  }
+  // const getUserCounties = async (userId) => {
+  //   let raw = await fetch(`http://localhost:3001/userCounties/${userId}`);
+  //   let res = await raw.json();
+  //   res = res.map(c => c.name);
+  //   // console.log('saved counties: ', res);
+  //   localStorage.setItem('counties', JSON.stringify(res));
+  // }
 
   const addCounty = async () => {
     const county = inputRef.current.value;
@@ -75,7 +82,7 @@ function App() {
         county: inputRef.current.value,
       }),
     });
-    getUserCounties(localStorage.getItem('userID'));
+    // getUserCounties(localStorage.getItem('userID'));
     setUserCounties([...userCounties, inputRef.current.value]);
     console.log(`Added ${county}`);
   };
@@ -89,6 +96,7 @@ function App() {
   const currentUserDisplay = () =>{
     // console.log(currentForm)
     if(localStorage.getItem('user')){
+      console.log("HELLo")
       getWatchList(localStorage.getItem('userID'))
       return <Loggedin userName = {localStorage.getItem('user')} onFormSwitch={toggleForm}/>
     }
@@ -99,13 +107,14 @@ function App() {
       return <Register onFormSwitch={toggleForm}/>
     }
     else{
+      console.log("NT WORKING")
       return <Loggedin userName = {currentForm} onFormSwitch={toggleForm}/>
     }
   }
 
   const getCountyDisplay = () => {
     if(localStorage.getItem('user')) {
-      getUserCounties(localStorage.getItem('userID'));
+      // getUserCounties(localStorage.getItem('userID'));
       return (
         <div className="countySection">
               <div class="dropdown">

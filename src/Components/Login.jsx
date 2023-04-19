@@ -24,8 +24,14 @@ export const Login= (props) =>{
         if(response.status===200){
           localStorage.setItem('user', username)
           localStorage.setItem('userID',data.user.userID)
+          
+          let raw = await fetch(`http://localhost:3001/userCounties/${data.user.userID}`);
+          let res = await raw.json();
+          res = res.map(c => c.name);
+          // console.log('saved counties: ', res);
+          localStorage.setItem('counties', JSON.stringify(res));
           props.onFormSwitch(username)
-          window.location.reload();
+
         }
     }
   return (
