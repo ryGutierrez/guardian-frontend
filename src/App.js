@@ -80,7 +80,7 @@ function App() {
     console.log(`Added ${county}`);
   };
 
-  const cancelCountyItem = async (county) => {
+  const deleteCounty = async (county) => {
     await fetch(`http://localhost:3001/deleteCounty/${localStorage.getItem('userID')}/${county}`);
     setUserCounties(userCounties.filter(c => c !== county));
     console.log(`Removed ${county}`);
@@ -150,7 +150,7 @@ function App() {
                         userCounties.map(county => 
                           <span className="countyItem">
                             {county}
-                            <button type="button" className="cancelCountyBtn"><FontAwesomeIcon className="cancelCountyXmark" icon={faXmark}/></button>
+                            <button type="button" className="cancelCountyBtn" onClick={() => deleteCounty(county)}><FontAwesomeIcon className="cancelCountyXmark" icon={faXmark}/></button>
                           </span>
                         )
                       }
