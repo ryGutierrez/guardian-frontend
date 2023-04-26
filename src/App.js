@@ -49,13 +49,13 @@ function App() {
     setShowModal(!showModal);
   }
 
-  // const getUserCounties = async (userId) => {
-  //   let raw = await fetch(`http://localhost:3001/userCounties/${userId}`);
-  //   let res = await raw.json();
-  //   res = res.map(c => c.name);
-  //   // console.log('saved counties: ', res);
-  //   localStorage.setItem('counties', JSON.stringify(res));
-  // }
+  const updateUserCounties = async (userId) => {
+    let raw = await fetch(`http://localhost:3001/userCounties/${userId}`);
+    let res = await raw.json();
+    res = res.map(c => c.name);
+    console.log('saved counties: ', res);
+    localStorage.setItem('counties', JSON.stringify(res));
+  }
 
   const addCounty = async () => {
     const county = inputRef.current.value;
@@ -82,7 +82,7 @@ function App() {
         county: inputRef.current.value,
       }),
     });
-    // getUserCounties(localStorage.getItem('userID'));
+    updateUserCounties(localStorage.getItem('userID'));
     setUserCounties([...userCounties, inputRef.current.value]);
     console.log(`Added ${county}`);
   };
@@ -114,7 +114,7 @@ function App() {
 
   const getCountyDisplay = () => {
     if(localStorage.getItem('user')) {
-      // getUserCounties(localStorage.getItem('userID'));
+      updateUserCounties(localStorage.getItem('userID'));
       return (
         <div className="countySection">
               <div class="dropdown">
@@ -141,7 +141,7 @@ function App() {
                   <datalist id="countyList">
                     {
                       Object.keys(counties).map(county => 
-                        <option value={county} onClick={localStorage.setItem('currCounty', county)}>{county}</option>
+                        <option value={county}>{county}</option>
                       )
                     }
                   </datalist>
