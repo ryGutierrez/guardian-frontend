@@ -1,11 +1,17 @@
 import React,{useState} from 'react'
 import './css/login.css';
-
+import axios from 'axios';
 export const Login= (props) =>{
     const [username,setUsername] = useState('');
     const [pass,setPass] = useState('');
 
-
+    const getWatchList=async (id)=>{
+      await axios.get('/getwatchlist/'+id)
+      .then((response) =>{
+        const res = response.data.map(obj => obj.IncidentId);
+        localStorage.setItem("watchlist",JSON.stringify(res))
+      })
+    }
     //this is where you would send the login to the backend.
     const handleSubmit = async (e) =>{
         e.preventDefault();
@@ -25,11 +31,13 @@ export const Login= (props) =>{
           localStorage.setItem('user', username)
           localStorage.setItem('userID',data.user.userID)
           
+          await getWatchList(data.user.userID)
           let raw = await fetch(`http://localhost:3001/userCounties/${data.user.userID}`);
           let res = await raw.json();
           res = res.map(c => c.name);
           // console.log('saved counties: ', res);
           localStorage.setItem('counties', JSON.stringify(res));
+          console.log(localStorage.getItem('watchlist'),"watchlist")
           props.onFormSwitch(username)
 
         }

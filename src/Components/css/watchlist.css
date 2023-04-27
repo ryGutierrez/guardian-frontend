@@ -1,0 +1,13 @@
+.watchItem{
+    height:49vh;
+    font-size: 15px;
+    font-weight: 600;
+    overflow: scroll;
+}
+.item{
+    margin-bottom: .6em;
+    padding:5px
+}
+.item:nth-child(odd){
+    background-color: rgb(230, 230, 230);
+}

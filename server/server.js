@@ -30,7 +30,7 @@ async function dbConnect() {
         await sql.connect({
             user: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
-            server: process.env.DB_SERVER,
+            server: String(process.env.DB_SERVER),
             database: process.env.DB_NAME,
         });
         dbConnected = true;
@@ -65,10 +65,17 @@ app.get("/latest", async (req, res) => {
 app.get("/getwatchlist/:id", async (req, res) => {
     //console.log(req.params.id)
     let result = await sql.query`SELECT IncidentId FROM Watching WHERE UserId = ${req.params.id}`;
-
+    // console.log(result.recordset)
     res.send(result.recordset);
 });
+app.get("/getStory/:id", async (req,res)=>{
+    console.log(req.params.id.slice(1,req.params.id.length-1),"REQID")
+    const idList = JSON.parse(req.params.id)
 
+    let result = await sql.query`SELECT header FROM Incidents WHERE incidentID IN (${idList})`;
+    console.log(result.recordset[0],"RECORD")
+    res.send(result.recordset)
+})
 app.post('/removewatching', async (req, res) => {
     console.log(req.body.username)
     let result = await sql.query`DELETE FROM Watching WHERE UserId = ${req.body.userID} AND incidentId=${req.body.storyID}`;

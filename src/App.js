@@ -8,6 +8,7 @@ import { Register } from './Components/Register';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBinoculars, faCirclePlus, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import {Loggedin} from './Components/Loggedin'
+import Watchlist from './Components/Watchlist';
 import StickyBox from "react-sticky-box";
 import Modal from "react-modal";
 import counties from './counties.json';
@@ -19,31 +20,29 @@ function App() {
   const [currentForm, setCurrentForm] = useState('login')
   const [showModal, setShowModal] = useState(false);
   const [currCounty, setCurrCounty] = useState(null);
-  const [userCounties, setUserCounties] = useState([]);
-  useEffect(()=>{
-    if(currentForm!=="login" || currentForm!=='register'){
-      console.log("UseEffect")
-      setUserCounties(JSON.parse(localStorage.getItem('counties')))
-      console.log(userCounties)
-    }
-  },[currentForm])
+  const [userCounties, setUserCounties] = useState(JSON.parse(localStorage.getItem('counties')));
+  const [watchlist,setWatchlist] = useState(localStorage.getItem('watchlist'))
+
   // Reference variables
   const inputRef = useRef();
 
   // Functions
   const toggleForm = (formName) =>{
-    console.log(formName)
     setCurrentForm(formName)
     window.location.reload()
   }
+  const toggleWatchList = (watchId)=>{
+    let getItems = localStorage.getItem('watchlist').slice(1,localStorage.getItem('watchlist').length-1)
+    getItems = getItems.split(",")
+    getItems.push(watchId)
+    // getItems+=","+watchId
+    getItems = "["+getItems.toString()+"]"
+    // console.log(getItems,"NEW WATCH")
+    localStorage.setItem('watchlist',getItems)
+    setWatchlist(getItems)
 
-  const getWatchList=(id)=>{
-    axios.get('/getWatchlist/'+id)
-    .then((response) => {
-      // console.log(response.data)
-      localStorage.setItem("watchlist",response.data)
-    })
   }
+
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -96,8 +95,6 @@ function App() {
   const currentUserDisplay = () =>{
     // console.log(currentForm)
     if(localStorage.getItem('user')){
-      console.log("HELLo")
-      getWatchList(localStorage.getItem('userID'))
       return <Loggedin userName = {localStorage.getItem('user')} onFormSwitch={toggleForm}/>
     }
     if(currentForm==="login"){
@@ -195,12 +192,13 @@ function App() {
                 </div>
                 <b>Watching</b>
                 <div className = "watchList">
+                  <Watchlist watching={watchlist}/>
                 </div>
               </div>
           </div>
         </StickyBox>
         <div className="AppStories">
-          <Stories/>
+          <Stories addToWatchlist={toggleWatchList}/>
         </div>
       </div>
     </div>

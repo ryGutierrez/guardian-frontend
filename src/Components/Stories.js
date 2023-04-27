@@ -7,7 +7,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare} from '@fortawesome/free-solid-svg-icons'
 import moment from "moment"
-export default function Stories() {
+export default function Stories(props) {
     const [storiesState, setStories] = useState([])
     const [currStory,setCurr] = useState([])
     const [currTab,setTab] = useState("Popular")
@@ -103,16 +103,18 @@ export default function Stories() {
             else{
                 e.target.id = "watching-inter"
                 console.log("WATCHING",localStorage.getItem("user"))
+                console.log("ADD TO WATCHLIST FUNCTION")
+                props.addToWatchlist(id)
                 let response = await fetch('/watching', { // send username and incident id through POST body.
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  storyID: id,
-                  userID:localStorage.getItem('userID')
-                }),
-              });
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        storyID: id,
+                        userID:localStorage.getItem('userID')
+                    }),
+                });
             }
             
         }
