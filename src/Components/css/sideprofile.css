@@ -81,7 +81,7 @@
     grid-area: watching;
 }
 .watchList{
-    border-left: 2px black solid;
+    /* border-left: 2px black solid; */
     grid-area: watchList;
     padding-top: 5px;
     display: flex;

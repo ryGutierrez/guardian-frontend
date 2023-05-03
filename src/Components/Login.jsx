@@ -8,8 +8,14 @@ export const Login= (props) =>{
     const getWatchList=async (id)=>{
       await axios.get('/getwatchlist/'+id)
       .then((response) =>{
-        const res = response.data.map(obj => obj.IncidentId);
-        localStorage.setItem("watchlist",JSON.stringify(res))
+        console.log(response)
+        if(response.data==='NO RECORDS'){
+          localStorage.setItem("watchlist",null)
+        }
+        else{
+          const res = response.data.map(obj => obj.IncidentId);
+          localStorage.setItem("watchlist",JSON.stringify(res))
+        }
       })
     }
     //this is where you would send the login to the backend.
@@ -37,7 +43,7 @@ export const Login= (props) =>{
           res = res.map(c => c.name);
           // console.log('saved counties: ', res);
           localStorage.setItem('counties', JSON.stringify(res));
-          console.log(localStorage.getItem('watchlist'),"watchlist")
+          // console.log(localStorage.getItem('watchlist').length,"watchlist")
           props.onFormSwitch(username)
 
         }

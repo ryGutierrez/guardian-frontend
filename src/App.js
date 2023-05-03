@@ -22,6 +22,7 @@ function App() {
   const [currCounty, setCurrCounty] = useState(null);
   const [userCounties, setUserCounties] = useState(JSON.parse(localStorage.getItem('counties')));
   const [watchlist,setWatchlist] = useState(localStorage.getItem('watchlist'))
+  const [sideView,setSideView] = useState(null)
 
   // Reference variables
   const inputRef = useRef();
@@ -32,17 +33,34 @@ function App() {
     window.location.reload()
   }
   const toggleWatchList = (watchId)=>{
-    let getItems = localStorage.getItem('watchlist').slice(1,localStorage.getItem('watchlist').length-1)
-    getItems = getItems.split(",")
-    getItems.push(watchId)
-    // getItems+=","+watchId
-    getItems = "["+getItems.toString()+"]"
-    // console.log(getItems,"NEW WATCH")
-    localStorage.setItem('watchlist',getItems)
-    setWatchlist(getItems)
+    console.log(localStorage.getItem('watchlist'))
+    if(localStorage.getItem('watchlist')==="null"){
+      let getItems = []
+      getItems.push(watchId)
+      console.log(getItems.toString)
+      getItems = "["+getItems.toString()+"]"
+      localStorage.setItem('watchlist',getItems)
+      setWatchlist(getItems)  
+    }
+    else{
+      console.log(typeof localStorage.getItem('watchlist'),"NULL")
+      let getItems = localStorage.getItem('watchlist').slice(1,localStorage.getItem('watchlist').length-1)
+      getItems = getItems.split(",")
+      console.log(localStorage.getItem('watchlist'))
+      getItems.push(watchId)
+      getItems = "["+getItems.toString()+"]"
+      // getItems+=","+watchId
+      // console.log(getItems,"NEW WATCH")
+      localStorage.setItem('watchlist',getItems)
+      setWatchlist(getItems)
+    }
+
 
   }
-
+  const sideViewloader = (id)=>{
+    console.log(id,"sideView")
+    setSideView(id)
+  }
 
   const toggleModal = () => {
     setShowModal(!showModal);
@@ -192,13 +210,13 @@ function App() {
                 </div>
                 <b>Watching</b>
                 <div className = "watchList">
-                  <Watchlist watching={watchlist}/>
+                  <Watchlist toggleSideView = {sideViewloader}watching={watchlist}/>
                 </div>
               </div>
           </div>
         </StickyBox>
         <div className="AppStories">
-          <Stories addToWatchlist={toggleWatchList}/>
+          <Stories addToWatchlist={toggleWatchList} loadSideView={sideView}/>
         </div>
       </div>
     </div>

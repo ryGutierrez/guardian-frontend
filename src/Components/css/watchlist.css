@@ -1,12 +1,26 @@
 .watchItem{
     height:49vh;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     overflow: scroll;
 }
 .item{
-    margin-bottom: .6em;
-    padding:5px
+    border-left: 2px black solid;
+    /* margin-bottom: .6em; */
+    padding:5px;
+    display:grid;
+    align-items: center;
+    grid-template-columns: 92% auto;
+
+    grid-template-areas: 
+    "title trash";
+}
+.item>.watchTitle{
+    grid-area: title;
+}
+.fonticon{
+    font-size:15px;
+    grid-area:trash
 }
 .item:nth-child(odd){
     background-color: rgb(230, 230, 230);
