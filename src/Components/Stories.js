@@ -12,7 +12,8 @@ export default function Stories(props) {
     const [currStory,setCurr] = useState([])
     const [currTab,setTab] = useState("Popular")
     const [watchlistStory,setWatchStory] = useState("loading")
-    const [newUser,setnewUser] = useState(false)
+    const [newUser,setnewUser] = useState(true)
+    const [checkUserDone, setCheck] = useState(-1)
      //Story Tabs {Latest, Popular, Mine}
     if(props.loadSideView!=null){
         console.log(props.loadSideView,"Stories LOADING PROPS SIDE")
@@ -107,6 +108,9 @@ export default function Stories(props) {
     //returnStories function is being used by the second return statement.
     //1. we need to load stories from the database and put them into an array and pass the array into this function
     function returnStories(story){
+        const tagsDone = ()=>{
+            setCheck(checkUserDone*-1)
+        }
         const subToTag = (e)=>{
             console.log(e.target)
             if(e.target.className === "tagButtonSelected"){
@@ -139,7 +143,7 @@ export default function Stories(props) {
                     <button className="tagButton" id="Traffic"Style="color:yellow"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faTrafficLight} />Traffic Hazards</button>
                     <button className="tagButton" id="Construction"Style="color:brown"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faPersonDigging} />Construction</button>
                     <button className="tagButton" id="Weather" Style="color:grey"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faCloudBolt} />Weather</button>
-                    <button>Done</button>
+                    <button onClick={tagsDone}>Done</button>
                 </div>)
 
         }
@@ -221,15 +225,26 @@ export default function Stories(props) {
         )
     }
 
-    // const isWatching = (id) =>{
-
-    // }
     useEffect(() => {
         if(currTab === "Mine"){
             axios.get('/getsubscriptions/'+localStorage.getItem("userID"))
             .then((response) => {
                 if(response.data==="F"){
-                    setnewUser(true)
+                    console.log(response.data,"DATA")
+                    return
+                }
+                else{
+                    let stories = []
+                    for(let i = 0; i<response.data.length;i++){
+                     let s = response.data[i]
+                     s.date=moment(s.date).utc().format('YYYY-MM-DD')
+                     stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
+                     // console.log(response.data[i].details)
+                    }
+                    setnewUser(false)
+                    setCurr(stories[0])
+                    setStories(stories);
+                    console.log(response.data)
                 }
             })
         }
@@ -251,7 +266,7 @@ export default function Stories(props) {
         console.log("Stories component loaded...");
         
       
-      }, [currTab]);
+      }, [currTab,checkUserDone]);
 
     return (
         <div className = "MainWindow">

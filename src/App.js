@@ -30,7 +30,9 @@ function App() {
   // Functions
   const toggleForm = (formName) =>{
     setCurrentForm(formName)
-    window.location.reload()
+    if(formName!="register"){
+      window.location.reload()
+    }
   }
   const toggleWatchList = (watchId)=>{
     console.log(localStorage.getItem('watchlist'))
@@ -111,7 +113,7 @@ function App() {
   }
 
   const currentUserDisplay = () =>{
-    // console.log(currentForm)
+    console.log(currentForm)
     if(localStorage.getItem('user')){
       return <Loggedin userName = {localStorage.getItem('user')} onFormSwitch={toggleForm}/>
     }

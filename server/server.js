@@ -51,11 +51,25 @@ app.get("/incidents", async (req, res) => {
 });
 app.get("/getsubscriptions/:id",async (req,res)=>{
     console.log(req.params.id)
-    let result = await sql.query`SELECT * FROM Subscriptions WHERE userID = ${req.params.id}`;
-    console.log(result.recordset.length,"mispelled");
-    if(result.recordset.length === 0){
-        res.send("F")
+    async function fetchSub() {
+        // await response of fetch call
+        let response =  await sql.query`SELECT * FROM Subscriptions WHERE userID = ${req.params.id}`;;
+        // only proceed once promise is resolved
+        let data = await response.recordset.length;
+        console.log(data,"Data")
+        return data;
     }
+    fetchSub().then(async (data)=>{
+        if(data===0){
+            res.send("F")
+        }
+        else{
+            console.log("FETCHSUB")
+            let result = await sql.query`SELECT * FROM Incidents INNER JOIN Subscriptions ON Incidents.tag = Subscriptions.tagID WHERE Subscriptions.userID = ${req.params.id};`
+            console.log(result.recordset,"RECODSET")
+            res.send(result.recordset)
+        }
+    })
     // res.send(result.recordset);
 })
 app.post("/removesubscription/:id/:tag",async (req,res)=>{
@@ -175,14 +189,17 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     let result = await sql.query`select * from Users where username=${req.body.username}`;
     if(result.rowsAffected == 0) { // no matching email
+        console.log(result.recordset[0],"resultAF")
         res.status(400).send({status: 'failure', message: 'No matching email'})
         return;
     }
     let match = await bcrypt.compareSync(req.body.password, result.recordset[0]['password']);
     if(!match) { // password mismatch
+        console.log(result.recordset[0],"resultMIS")
         res.status(400).send({status: 'failure', message: 'Password mismatch'});
         return;
     }
+    console.log(result.recordset[0],"result")
     res.status(200).send({status: 'success', message: 'Login successful', user: result.recordset[0]});
 
 });
