@@ -4,10 +4,25 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config()
 const bcrypt = require('bcrypt');
+const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+const nodemailer = require('nodemailer');
 
 const saltRounds = 10;
 const PORT = 3001;
-var dbConnected = false;
+var dbConnected = false
+const NOTIFY_INTERVAL_MS = 30000;
+var timeLastNotified = getDateTime();
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        type: 'OAuth2',
+        user: process.env.GMAIL_EMAIL,
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+    }
+});
 
 const app = express();
 app.use(cors());
@@ -16,6 +31,8 @@ app.use(bodyParser.json());
 app.use(didConnect); // ensures all requests to server are denied until database connection is successful
 
 dbConnect();
+
+// Functions
 
 function didConnect(req, res, next) {
     if(dbConnected)
@@ -41,6 +58,62 @@ async function dbConnect() {
         throw err;
     }
 }
+
+// 
+function padNum(num, n) {
+    return '0'.repeat(n - (num+'').length)+num
+}
+
+function getDateTime() {
+    let now = new Date();
+    return `${now.getFullYear()}-${padNum(now.getMonth() + 1, 2)}-${padNum(now.getDate(), 2)} ${padNum(now.getHours(), 2)}:${padNum(now.getMinutes(), 2)}:${padNum(now.getSeconds(), 2)}.${padNum(now.getMilliseconds(), 3)}`
+}
+
+async function notifyUsers() {
+    console.log(`Starting notifyUsers at ${getDateTime()}`)
+    let result = await sql.query`select header, date, county from Incidents
+    where date > ${timeLastNotified} and county not in ('null', 'NULL', 'N/A', '*N/A*')`;
+    let newIncidents = result.recordset;
+
+    result = await sql.query`select username, email, name as county from Users join Counties on Users.userID = Counties.userId`
+    let usersJoinCounties = result.recordset;
+
+    for(const userRow of usersJoinCounties) {
+        for(const incidentRow of newIncidents) {
+            let splitCounties = incidentRow.county.split(', ');
+            for(const s of splitCounties) {
+                if(s.includes(userRow.county)) {
+                    console.log(`Sending notification to ${userRow.username} with email: ${userRow.email}:\n\t${incidentRow.header}\n\tin ${userRow.county}`);
+                    // twilio.messages.create({
+                    //     body: `ALERT! ${incidentRow.header}\nLocation: ${s}${s.includes('County') ? "" : " County"}`,
+                    //     to: '+1',
+                    //     from: process.env.TWILIO_PHONE_NUMBER,
+                    // }).then((message) => console.log(message.sid));
+                    transporter.sendMail({
+                        from: process.env.DEV_EMAIL,
+                        to: userRow.email,
+                        subject: 'Guardian Notification',
+                        text: `ALERT! ${incidentRow.header}\nLocation: ${s}${s.includes('County') ? "" : " County"}`,
+                    }, (error, info) => {
+                        if(error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                }
+            }
+        }
+    }
+    
+
+    timeLastNotified = getDateTime();
+    console.log(`Ending notifyUsers at ${timeLastNotified}`);
+
+
+}
+
+setInterval(notifyUsers, NOTIFY_INTERVAL_MS);
 
 
 // Routes
