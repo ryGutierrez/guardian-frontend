@@ -82,27 +82,30 @@
 }
 
 .storysection{
+    box-shadow: 0px -0.8px 2px rgba(0, 0, 0, 0.638);
     margin-top: 4vh;
     width:100%;
-    height:100%;
+    height: 90vh;
     display: flex;
     align-items: center;
     flex-direction: column;
-    row-gap:47px;
+    overflow: scroll;
 }
 
 .storysection > .storycontainer{
-    box-shadow: 0px 3.5px 3px grey;
-    background-color: #000000;
-    width:80%;
+    /* background-color: #000000; */
     padding-bottom: 3px;
-    border-radius: 8px;
+    border-top:1.5px solid black;
     /* box-shadow: 0px 20px; */
 }
 .storysection > .storycontainer >.story{
-    background-color: #343434;
-    width:100%;
+    background-color: #262950;
+    color:white;
+    margin: auto;
+    margin-top: 1em;
+    border: 1.5px solid #262950;
     border-radius: 8px;
+    width:92%;
     display: grid;
     padding-top:.5em;
     padding-top:.5em;
@@ -114,7 +117,6 @@
 
 }
 .storycontainer > .interactions{
-    color:white;
     font-size: 19px;
     padding: 1px;
     /* height:15px; */
@@ -141,7 +143,6 @@
 }
 .story > .storyTD{
     grid-area:header;
-    color: white;
     height:90%;
     width:95%;
     display:grid;
@@ -172,7 +173,6 @@
 
 .story > .storyDT{
     grid-area:info;
-    color: white;
     margin-bottom: .5em;
     margin-bottom: .5em;
     width:95%;
@@ -196,7 +196,7 @@
 #seeMore{
     border:none;
     background-color: transparent;
-    color:rgb(201, 201, 201);
+    color:rgb(207, 207, 207);
     font-size: 16px;
     font-weight: 500;
 }

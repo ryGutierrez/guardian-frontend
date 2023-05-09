@@ -96,8 +96,8 @@ export default function Stories(props) {
             this.id = id
             this.shortenedDetails = details
             this.hideBtn = true
-            if(this.details.length>=150){
-                this.shortenedDetails=this.details.substring(0,150)+"...";
+            if(this.details.length>=160){
+                this.shortenedDetails=this.details.substring(0,160)+"...";
                 this.hideBtn = false
             }
         }
@@ -136,14 +136,16 @@ export default function Stories(props) {
         }
         else if(currTab==="Mine" && newUser===true){
             return(
-                <div className="newUser">
-                    <span id = "title">Subscribe to Tags</span>
-                    <button className="tagButton" id="Fire"Style="color:red" onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faFire} />Fires</button>
-                    <button className="tagButton" id="Flood"Style="color:#6d96ef" onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faHouseFloodWater} />Flooding</button>
-                    <button className="tagButton" id="Traffic"Style="color:yellow"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faTrafficLight} />Traffic Hazards</button>
-                    <button className="tagButton" id="Construction"Style="color:brown"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faPersonDigging} />Construction</button>
-                    <button className="tagButton" id="Weather" Style="color:grey"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faCloudBolt} />Weather</button>
-                    <button onClick={tagsDone}>Done</button>
+                <div className="storysection">
+                    <div className="newUser">
+                        <span id = "title">Subscribe to Tags</span>
+                        <button className="tagButton" id="Fire"Style="color:red" onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faFire} />Fires</button>
+                        <button className="tagButton" id="Flood"Style="color:#6d96ef" onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faHouseFloodWater} />Flooding</button>
+                        <button className="tagButton" id="Traffic"Style="color:yellow"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faTrafficLight} />Traffic Hazards</button>
+                        <button className="tagButton" id="Construction"Style="color:brown"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faPersonDigging} />Construction</button>
+                        <button className="tagButton" id="Weather" Style="color:grey"onClick={(e)=>{subToTag(e)}}><FontAwesomeIcon className="tagicon" icon={faCloudBolt} />Weather</button>
+                        <button onClick={tagsDone}>Done</button>
+                    </div>
                 </div>)
 
         }
