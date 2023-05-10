@@ -17,6 +17,8 @@ app.use(didConnect); // ensures all requests to server are denied until database
 
 dbConnect();
 
+// Functions
+
 function didConnect(req, res, next) {
     if(dbConnected)
         next();
@@ -40,6 +42,15 @@ async function dbConnect() {
         dbConnected = false;
         throw err;
     }
+}
+
+const padNum = (num, n) => {
+    return '0'.repeat(n - (num+'').length)+num
+}
+
+const getDateTime = () => {
+    let now = new Date();
+    return `${now.getFullYear()}-${padNum(now.getMonth() + 1, 2)}-${padNum(now.getDate(), 2)} ${padNum(now.getHours(), 2)}:${padNum(now.getMinutes(), 2)}:${padNum(now.getSeconds(), 2)}.${padNum(now.getMilliseconds(), 3)}`
 }
 
 
@@ -112,11 +123,11 @@ app.get("/getwatchlist/:id", async (req, res) => {
     }
 });
 app.get("/getStory/:id", async (req,res)=>{
-    console.log(req.params.id.slice(1,req.params.id.length-1),"REQID")
+    // console.log(req.params.id.slice(1,req.params.id.length-1),"REQID")
     const idList = JSON.parse(req.params.id)
 
     let result = await sql.query`SELECT * FROM Incidents WHERE incidentID IN (${idList})`;
-    console.log(result.recordset[0],"RECORD")
+    // console.log(result.recordset[0],"RECORD")
     res.send(result.recordset)
 })
 app.post('/removewatching/:id/:userid', async (req, res) => {
@@ -203,6 +214,35 @@ app.post('/login', async (req, res) => {
     res.status(200).send({status: 'success', message: 'Login successful', user: result.recordset[0]});
 
 });
+
+app.post('/postComment', async (req, res) => {
+    try {
+        console.log('Received body: '+JSON.stringify(req.body))
+        let result = await sql.query`insert into Comments (userID, incidentID, content, datePosted) values (${req.body.userId}, ${req.body.incidentId}, ${req.body.content}, ${getDateTime()})`;
+        res.sendStatus(200)
+    } catch (err) {
+        console.log(err)
+        res.send(500)
+    }
+});
+
+app.get('/deleteComment/:commentId', async (req, res) => {
+    
+    let result = await sql.query`delete from Comments where commentID = ${parseInt(req.params.commentId)}`;
+    console.log(result)
+    if(result.rowsAffected == 0) {
+        res.sendStatus(404);
+    } else {
+        res.sendStatus(200);
+    }
+});
+
+app.get('/getComments/:incidentId', async (req, res) => {
+    let result = await sql.query`select commentID, incidentID, content, datePosted, username from Comments join Users on Comments.userID = Users.userID where incidentID = ${parseInt(req.params.incidentId)}`;
+    console.log(result.recordset == undefined ? [] : result.recordset)
+    res.send(result.recordset == undefined ? [] : result.recordset);
+});
+
 
 app.get("/ping", async (req, res) => {
     let result = await sql.query(`SELECT GETDATE()`);

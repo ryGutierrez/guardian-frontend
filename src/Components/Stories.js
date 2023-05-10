@@ -1,12 +1,15 @@
 import React from 'react'
 import './css/stories.css';
-import { useState,useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import StickyBox from "react-sticky-box";
 import SideStories from './SideStories';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare,faTrafficLight,faPersonDigging,faCloudBolt} from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare,faTrafficLight,faPersonDigging,faCloudBolt, faHeartCircleCheck, faXmark} from '@fortawesome/free-solid-svg-icons'
 import moment from "moment"
+import Modal from "react-modal";
+import { isCompositeComponent } from 'react-dom/test-utils';
+
 export default function Stories(props) {
     const [storiesState, setStories] = useState([])
     const [currStory,setCurr] = useState([])
@@ -14,12 +17,20 @@ export default function Stories(props) {
     const [watchlistStory,setWatchStory] = useState("loading")
     const [newUser,setnewUser] = useState(true)
     const [checkUserDone, setCheck] = useState(-1)
-     //Story Tabs {Latest, Popular, Mine}
+    const [showComments, setShowComments] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [currIncidentId, setCurrIncidentId] = useState(-1);
+
+    // Reference variables
+    const inputRef = useRef();
+
+    //Story Tabs {Latest, Popular, Mine}
     if(props.loadSideView!=null){
         console.log(props.loadSideView,"Stories LOADING PROPS SIDE")
     }
-    const getcurrStory =()=>{
-        console.log("RUNNING CURRENT STORY")
+
+    const getcurrStory = () => {
+        // console.log("RUNNING CURRENT STORY")
         if(props.loadSideView!=null && localStorage.getItem("currWatchStory")!==props.loadSideView.toString()){
             console.log("GETTING STORY")
             axios.get('/getStory/'+props.loadSideView)
@@ -44,6 +55,7 @@ export default function Stories(props) {
             return currStory
         }
     }
+
     //Latest backend query goes in this function 
     const TabSwitch = async (e) =>{
         e.preventDefault()
@@ -51,6 +63,73 @@ export default function Stories(props) {
         document.getElementById(currTab+"-active").id = currTab
         setTab(e.target.getAttribute("id"))
         document.getElementById(e.target.getAttribute("id")).id = e.target.getAttribute("id")+"-active"
+    }
+
+    const toggleComments = async (incidentId) => {
+        if(showComments) {
+            setShowComments([])
+            setCurrIncidentId(-1);
+        } else {
+            fetchComments(incidentId)
+        }
+        setShowComments(!showComments);
+        // console.log('commentIncidentId = ' + commentIncidentId)
+    }
+
+    const fetchComments = async (incidentId) => {
+        let res = await fetch('/getComments/'+incidentId)
+        let comments = await res.json();
+        console.log('comments -> ' + JSON.stringify(comments))
+        setComments(comments)
+        setCurrIncidentId(incidentId);
+    }
+
+    const postComment = async () => {
+        const content = inputRef.current.value;
+
+        let res = await fetch('/postComment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: localStorage.getItem('userID'),
+              incidentId: currIncidentId,
+              content: inputRef.current.value,
+            }),
+        })
+        fetchComments(currIncidentId);
+    }
+
+    const deleteComment = async (comment) => {
+        await fetch('/deleteComment/'+comment.commentID);
+        setComments(comments.filter(c => c != comment));
+    }
+
+    const padNum = (num, n) => {
+        return '0'.repeat(n - (num+'').length)+num
+    }
+    
+    const getDateTime = () => {
+        let now = new Date();
+        return `${now.getFullYear()}-${padNum(now.getMonth() + 1, 2)}-${padNum(now.getDate(), 2)} ${padNum(now.getHours(), 2)}:${padNum(now.getMinutes(), 2)}:${padNum(now.getSeconds(), 2)}.${padNum(now.getMilliseconds(), 3)}`
+    }
+
+    // Returns a string representing aproximately how long ago the date was from the current time (i.e. "1 hour ago", "1 month ago", etc)
+    // @param datetime (String) a mssql datetime object represented as a string
+    const convertDate = (datetime) => {
+        let now = getDateTime().split(/[-\s:.TZ]+/);
+        datetime = datetime.split(/[-\s:.TZ]+/);
+        let names = ["year", "month", "day", "hour", "minute", "second"];
+    
+        for(let i=0; i<6; i++) {
+            if(now[i] != datetime[i]) {
+                let diff = parseInt(now[i]) - parseInt(datetime[i])
+                let name = names[i]
+                return `${diff} ${diff == 1 ? name : name+'s'} ago`
+            }
+        }
+        return 'now';
     }
     
     //story class
@@ -74,10 +153,10 @@ export default function Stories(props) {
                 this.shortenedDetails=this.details.substring(0,150)+"...";
                 this.hideBtn = false
             }
-            if(tag == "fire"){
+            if(tag === "fire"){
                 this.tag=faFire
             }
-            else if(tag == "flood"){
+            else if(tag === "flood"){
                 this.tag=faHouseFloodWater
             }
             this.id = id
@@ -87,10 +166,10 @@ export default function Stories(props) {
                 this.shortenedDetails=this.details.substring(0,150)+"...";
                 this.hideBtn = false
             }
-            if(tag == "fire"){
+            if(tag === "fire"){
                 this.tag=faFire
             }
-            else if(tag == "flood"){
+            else if(tag === "flood"){
                 this.tag=faHouseFloodWater
             }
             this.id = id
@@ -150,10 +229,10 @@ export default function Stories(props) {
 
         }
         function showMore(id,s){
-            document.getElementById(id).innerHTML= s.details;
+            document.getElementById(id).innerHTML = s.details;
             setCurr(s)
         }
-        const interaction= async (e,id)=>{
+        const interaction = async (e,id)=>{
             e.preventDefault()
             console.log(e.target.getAttribute('id'))
             // e.target.getAttribute('id')
@@ -195,33 +274,33 @@ export default function Stories(props) {
                     
                     //gets the stories from the array and maps each one onto the html page like this.
                     story.map(s =>
-                    <div className="storycontainer" key={s.id}>
-                        <div className="story">
-                            <div className="storyTD">
-                                <p className="Title">{s.title}</p>
-                                <p className="Date">Reported {s.date}</p>
+                        <div className="storycontainer" key={s.id}>
+                            <div className="story">
+                                <div className="storyTD">
+                                    <p className="Title">{s.title}</p>
+                                    <p className="Date">Reported {s.date}</p>
+                                </div>
+                                <div className="storyDT">
+                                    <p className="storydetails " id={s.id}>{s.shortenedDetails}<button id ="seeMore" hidden={s.hideBtn}><span key={s.title} onClick={()=>showMore(s.id,s)}>see more</span></button></p>
+                                    <FontAwesomeIcon className="icon" icon={s.tag} />
+                                </div>
                             </div>
-                            <div className="storyDT">
-                                <p className="storydetails " id={s.id}>{s.shortenedDetails}<button id ="seeMore" hidden={s.hideBtn}><span key={s.title}onClick={()=>showMore(s.id,s)}>see more</span></button></p>
-                                <FontAwesomeIcon className="icon" icon={s.tag} />
+                            <div className="interactions">
+                                <div id = {"comment"+s.id} className="action" onClick={() => { setCurr(s); toggleComments(s.id);}}>
+                                    <FontAwesomeIcon className="icon" icon={faComment}/>
+                                    <p>1289</p>
+                                </div>
+                                <div id = {"watching"+s.id} className="action" onClick={(e)=>interaction(e,s.id)}>
+                                    <FontAwesomeIcon className="icon" icon={faBinoculars} />
+                                    <p>1289</p>
+                                </div>
+                                <div id = "share" className = "action">
+                                    <FontAwesomeIcon icon={faShare} />
+                                    <p>1289</p>
+                                </div>
                             </div>
                         </div>
-                        <div className="interactions">
-                            <div id = {"comment"+s.id} className="action">
-                                <FontAwesomeIcon className="icon" icon={faComment}/>
-                                <p>1289</p>
-                            </div>
-                            <div id = {"watching"+s.id} className="action" onClick={(e)=>interaction(e,s.id)}>
-                                <FontAwesomeIcon className="icon" icon={faBinoculars} />
-                                <p>1289</p>
-                            </div>
-                            <div id = "share" className = "action">
-                                <FontAwesomeIcon icon={faShare} />
-                                <p>1289</p>
-                            </div>
-                        </div>
-                    </div>
-                         )
+                    )
                 }
             </div>
         )
@@ -260,13 +339,12 @@ export default function Stories(props) {
                 stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
                 // console.log(response.data[i].details)
                }
-               setCurr(stories[0])
+               setCurr(stories[0]);
                setStories(stories);
-               console.log(response.data)
+            //    console.log(response.data)
             })
         }
-        console.log("Stories component loaded...");
-        
+        console.log("Stories component loaded...");       
       
       }, [currTab,checkUserDone]);
 
@@ -289,11 +367,63 @@ export default function Stories(props) {
                     </button>
                 </div>
                 {returnStories(storiesState)}
+
             </div>
             <StickyBox className = "SideStories">
                 {/* <SideStories story={currStory}/> */}
                 <SideStories story={getcurrStory()} />
             </StickyBox>
+
+            <Modal isOpen={showComments} style={{
+                content: {
+                    margin: 'auto',
+                    width: '40%',
+                    height: '90%',
+                    backgroundColor: 'rgb(255,255,255)',
+                    overflowY: 'hidden',
+                },}}>
+
+                {/* Show comments here */}
+                <h5>{comments.length} Comment{comments.length != 1 ? 's' : ''}</h5>
+                
+                {
+                    localStorage.userID ? 
+                    <div className='commentSubmissionContainer'>
+                        <textarea className="commentTextArea" maxLength={500} placeholder='Leave a comment...' ref={inputRef}></textarea>
+                        <button className="submitCommentButton" type="button" onClick={() => postComment()}>Submit</button>                    
+                    </div>
+                    :
+                    ""
+                }
+
+                <div className='commentSection'>
+                    {
+                        comments.map(comment =>
+                            <div className='commentContainer'>
+                                <div>
+                                    <div className='commentTopSection'>
+                                        <span className='commentAuthor'>{comment.username}</span>
+                                        <span className='commentDate'>{convertDate(comment.datePosted)}</span>
+                                    </div>
+                                    <p className='commentContent'>{comment.content}</p>
+                                </div>
+                                <div>
+                                    { comment.username == localStorage.getItem('user') ? 
+                                    <button className='deleteCommentButton'>
+                                        <FontAwesomeIcon className="deleteCommentXmark" icon={faXmark} onClick={() => deleteComment(comment)}/>
+                                    </button>
+                                    :
+                                    ""}
+                                </div>
+                            </div>
+                        )
+                    }
+                </div>
+
+                <button className='closeCommentButton' type='button' onClick={toggleComments}>Close</button>
+
+  
+            </Modal>
         </div>
   )
   

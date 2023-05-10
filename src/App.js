@@ -69,7 +69,7 @@ function App() {
   }
 
   const updateUserCounties = async (userId) => {
-    let raw = await fetch(`http://localhost:3001/userCounties/${userId}`);
+    let raw = await fetch(`/userCounties/${userId}`);
     let res = await raw.json();
     res = res.map(c => c.name);
     console.log('saved counties: ', res);
