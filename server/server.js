@@ -34,6 +34,8 @@ dbConnect();
 
 // Functions
 
+// Functions
+
 function didConnect(req, res, next) {
     if(dbConnected)
         next();
@@ -47,7 +49,7 @@ async function dbConnect() {
         await sql.connect({
             user: process.env.DB_USERNAME,
             password: process.env.DB_PASSWORD,
-            server: process.env.DB_SERVER,
+            server: String(process.env.DB_SERVER),
             database: process.env.DB_NAME,
         });
         dbConnected = true;
@@ -122,15 +124,52 @@ app.get("/incidents", async (req, res) => {
     let result = await sql.query`SELECT * FROM Incidents`;
     res.send(result.recordset);
 });
-
+app.get("/getsubscriptions/:id",async (req,res)=>{
+    console.log(req.params.id)
+    async function fetchSub() {
+        // await response of fetch call
+        let response =  await sql.query`SELECT * FROM Subscriptions WHERE userID = ${req.params.id}`;;
+        // only proceed once promise is resolved
+        let data = await response.recordset.length;
+        console.log(data,"Data")
+        return data;
+    }
+    fetchSub().then(async (data)=>{
+        if(data===0){
+            res.send("F")
+        }
+        else{
+            console.log("FETCHSUB")
+            let result = await sql.query`SELECT * FROM Incidents INNER JOIN Subscriptions ON Incidents.tag = Subscriptions.tagID WHERE Subscriptions.userID = ${req.params.id};`
+            console.log(result.recordset,"RECODSET")
+            res.send(result.recordset)
+        }
+    })
+    // res.send(result.recordset);
+})
+app.post("/removesubscription/:id/:tag",async (req,res)=>{
+    console.log(req.params.id)
+    await sql.query`DELETE from Subscriptions WHERE userID = ${req.params.id} AND tagID=${req.params.tag}`
+    .catch((err) => {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+    });
+    res.sendStatus(200);
+})
+app.post("/addsubscription/:id/:tag",async (req,res)=>{
+    console.log(req.params.id)
+    let result = await sql.query`insert into Subscriptions (userID,tagID) values (${req.params.id},${req.params.tag})`;
+    res.sendStatus(200);
+})
 app.get("/popular", async (req, res) => {
-    let result = await sql.query`SELECT * FROM Incidents ORDER BY watching DESC`;
+    let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY watching DESC`;
     //console.log(result.recordset);
     res.send(result.recordset);
 });
 
 app.get("/latest", async (req, res) => {
-    let result = await sql.query`SELECT * FROM Incidents ORDER BY incidentID DESC`;
+    let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY incidentID DESC`;
     //console.log(result.recordset)
     res.send(result.recordset);
 });
@@ -138,20 +177,35 @@ app.get("/latest", async (req, res) => {
 app.get("/getwatchlist/:id", async (req, res) => {
     //console.log(req.params.id)
     let result = await sql.query`SELECT IncidentId FROM Watching WHERE UserId = ${req.params.id}`;
-
-    res.send(result.recordset);
+    console.log(result.recordset.length,"LENGTH")
+    if(result.recordset.length===0){
+        console.log("WHAT IS WE DOING")
+        res.send("NO RECORDS")
+    }
+    else{
+        res.send(result.recordset);
+    }
 });
+app.get("/getStory/:id", async (req,res)=>{
+    // console.log(req.params.id.slice(1,req.params.id.length-1),"REQID")
+    const idList = JSON.parse(req.params.id)
 
-app.post('/removewatching', async (req, res) => {
-    console.log(req.body.username)
-    let result = await sql.query`DELETE FROM Watching WHERE UserId = ${req.body.userID} AND incidentId=${req.body.storyID}`;
-    console.log(result,"removewatching")
+    let result = await sql.query`SELECT * FROM Incidents WHERE incidentID IN (${idList})`;
+    // console.log(result.recordset[0],"RECORD")
+    res.send(result.recordset)
+})
+app.post('/removewatching/:id/:userid', async (req, res) => {
+    console.log(req.params.id,req.params.userid,)
+    let result = await sql.query`DELETE FROM Watching WHERE UserId = ${req.params.userid} AND incidentId=${req.params.id}`;
+    console.log(result)
+    res.sendStatus(200);
 });
 
 app.post('/watching', async (req, res) => {
     console.log(req.body.username)
     let result = await sql.query`insert into Watching (UserId, incidentId) values (${req.body.userID}, ${req.body.storyID})`;
     console.log(result,"watching")
+    res.sendStatus(200);
 });
 
 app.get('/userCounties/:userId', async (req, res) => {
@@ -210,17 +264,49 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     let result = await sql.query`select * from Users where username=${req.body.username}`;
     if(result.rowsAffected == 0) { // no matching email
+        console.log(result.recordset[0],"resultAF")
         res.status(400).send({status: 'failure', message: 'No matching email'})
         return;
     }
     let match = await bcrypt.compareSync(req.body.password, result.recordset[0]['password']);
     if(!match) { // password mismatch
+        console.log(result.recordset[0],"resultMIS")
         res.status(400).send({status: 'failure', message: 'Password mismatch'});
         return;
     }
+    console.log(result.recordset[0],"result")
     res.status(200).send({status: 'success', message: 'Login successful', user: result.recordset[0]});
 
 });
+
+app.post('/postComment', async (req, res) => {
+    try {
+        console.log('Received body: '+JSON.stringify(req.body))
+        let result = await sql.query`insert into Comments (userID, incidentID, content, datePosted) values (${req.body.userId}, ${req.body.incidentId}, ${req.body.content}, ${getDateTime()})`;
+        res.sendStatus(200)
+    } catch (err) {
+        console.log(err)
+        res.send(500)
+    }
+});
+
+app.get('/deleteComment/:commentId', async (req, res) => {
+    
+    let result = await sql.query`delete from Comments where commentID = ${parseInt(req.params.commentId)}`;
+    console.log(result)
+    if(result.rowsAffected == 0) {
+        res.sendStatus(404);
+    } else {
+        res.sendStatus(200);
+    }
+});
+
+app.get('/getComments/:incidentId', async (req, res) => {
+    let result = await sql.query`select commentID, incidentID, content, datePosted, username from Comments join Users on Comments.userID = Users.userID where incidentID = ${parseInt(req.params.incidentId)}`;
+    console.log(result.recordset == undefined ? [] : result.recordset)
+    res.send(result.recordset == undefined ? [] : result.recordset);
+});
+
 
 app.get("/ping", async (req, res) => {
     let result = await sql.query(`SELECT GETDATE()`);

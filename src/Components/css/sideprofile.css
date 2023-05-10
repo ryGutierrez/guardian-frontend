@@ -5,7 +5,7 @@
     font-weight: 500;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    margin-top: 2em;
     align-items: left;
     font-family: Montserrat;
 }
@@ -66,7 +66,7 @@
 .watchingSection{
     margin-top: 10px;
     display:grid;
-    grid-template-columns: 18% 82%;
+    grid-template-columns: 15% auto;
     grid-template-areas: 
     "font watching"
     ". watchList"
@@ -81,10 +81,9 @@
     grid-area: watching;
 }
 .watchList{
-    margin-left: 16px;
-    border-left: 2px black solid;
+    /* border-left: 2px black solid; */
     grid-area: watchList;
-    padding-left: 5px;
+    padding-top: 5px;
     display: flex;
     flex-direction: column;
 }

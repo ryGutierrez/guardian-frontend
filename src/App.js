@@ -8,6 +8,7 @@ import { Register } from './Components/Register';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBinoculars, faCirclePlus, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons'
 import {Loggedin} from './Components/Loggedin'
+import Watchlist from './Components/Watchlist';
 import StickyBox from "react-sticky-box";
 import Modal from "react-modal";
 import counties from './counties.json';
@@ -19,30 +20,48 @@ function App() {
   const [currentForm, setCurrentForm] = useState('login')
   const [showModal, setShowModal] = useState(false);
   const [currCounty, setCurrCounty] = useState(null);
-  const [userCounties, setUserCounties] = useState([]);
-  useEffect(()=>{
-    if(currentForm!=="login" || currentForm!=='register'){
-      console.log("UseEffect")
-      setUserCounties(JSON.parse(localStorage.getItem('counties')))
-      console.log(userCounties)
-    }
-  },[currentForm])
+  const [userCounties, setUserCounties] = useState(JSON.parse(localStorage.getItem('counties')));
+  const [watchlist,setWatchlist] = useState(localStorage.getItem('watchlist'))
+  const [sideView,setSideView] = useState(null)
+
   // Reference variables
   const inputRef = useRef();
 
   // Functions
   const toggleForm = (formName) =>{
-    console.log(formName)
     setCurrentForm(formName)
-    window.location.reload()
+    if(formName!="register"){
+      window.location.reload()
+    }
   }
+  const toggleWatchList = (watchId)=>{
+    console.log(localStorage.getItem('watchlist'))
+    if(localStorage.getItem('watchlist')==="null"){
+      let getItems = []
+      getItems.push(watchId)
+      console.log(getItems.toString)
+      getItems = "["+getItems.toString()+"]"
+      localStorage.setItem('watchlist',getItems)
+      setWatchlist(getItems)  
+    }
+    else{
+      console.log(typeof localStorage.getItem('watchlist'),"NULL")
+      let getItems = localStorage.getItem('watchlist').slice(1,localStorage.getItem('watchlist').length-1)
+      getItems = getItems.split(",")
+      console.log(localStorage.getItem('watchlist'))
+      getItems.push(watchId)
+      getItems = "["+getItems.toString()+"]"
+      // getItems+=","+watchId
+      // console.log(getItems,"NEW WATCH")
+      localStorage.setItem('watchlist',getItems)
+      setWatchlist(getItems)
+    }
 
-  const getWatchList=(id)=>{
-    axios.get('/getWatchlist/'+id)
-    .then((response) => {
-      // console.log(response.data)
-      localStorage.setItem("watchlist",response.data)
-    })
+
+  }
+  const sideViewloader = (id)=>{
+    console.log(id,"sideView")
+    setSideView(id)
   }
 
   const toggleModal = () => {
@@ -50,7 +69,7 @@ function App() {
   }
 
   const updateUserCounties = async (userId) => {
-    let raw = await fetch(`http://localhost:3001/userCounties/${userId}`);
+    let raw = await fetch(`/userCounties/${userId}`);
     let res = await raw.json();
     res = res.map(c => c.name);
     console.log('saved counties: ', res);
@@ -94,10 +113,8 @@ function App() {
   }
 
   const currentUserDisplay = () =>{
-    // console.log(currentForm)
+    console.log(currentForm)
     if(localStorage.getItem('user')){
-      console.log("HELLo")
-      getWatchList(localStorage.getItem('userID'))
       return <Loggedin userName = {localStorage.getItem('user')} onFormSwitch={toggleForm}/>
     }
     if(currentForm==="login"){
@@ -195,12 +212,13 @@ function App() {
                 </div>
                 <b>Watching</b>
                 <div className = "watchList">
+                  <Watchlist toggleSideView = {sideViewloader}watching={watchlist}/>
                 </div>
               </div>
           </div>
         </StickyBox>
         <div className="AppStories">
-          <Stories/>
+          <Stories addToWatchlist={toggleWatchList} loadSideView={sideView}/>
         </div>
       </div>
     </div>
