@@ -32,10 +32,14 @@ export const Login= (props) =>{
           }),
         });
         const data = await response.json(); // use await response.json() to extract detailed messages from response
-        console.log(data.user.userID)
+        console.log(data)
         if(response.status===200){
           localStorage.setItem('user', username)
-          localStorage.setItem('userID',data.user.userID)
+          localStorage.setItem('userID', data.user.userID)
+          localStorage.setItem('email', data.user.email);
+          localStorage.setItem('phone', data.user.phoneNumber);
+          localStorage.setItem('notificationStyle', data.user.notificationStyle);
+
           
           await getWatchList(data.user.userID)
           let raw = await fetch(`http://localhost:3001/userCounties/${data.user.userID}`);
