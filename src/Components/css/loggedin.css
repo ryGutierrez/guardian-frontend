@@ -17,3 +17,77 @@
     width:30%;
     margin-bottom: 0.5em;
 }
+
+.accountCountainer {
+    display: flex;
+}
+
+.editAccount {
+    margin-left: 5px;
+    font-size: 50%;
+    color: rgb(59, 59, 59);
+}
+
+.editAccount:hover {
+    text-decoration: underline;
+}
+
+.editContainer {
+    width: 100%;
+    border-left: 2px solid black;
+    margin-bottom: 16px;
+    padding-left: 5px;
+}
+
+.editIcon {
+    margin-right: 5px;
+}
+
+.editTitle {
+    font-weight: 300;
+    font-size: 90%;
+}
+
+.accountButtons {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.closeAccountButton {
+    color:white;
+    font-size: 13px;
+    font-weight: 600;
+    border:none;
+    background-color: #EF8354;
+    padding: 8px;
+    border: #EF8354;
+    border-radius: 21px;
+    width:20%;
+    margin: 5px 5px 10px 5px;
+}
+
+.closeAccountButton:hover{
+    background-color: #c46a44;
+}
+
+.saveAccountButton {
+    color:white;
+    font-size: 13px;
+    font-weight: 600;
+    border:none;
+    background-color: #279AF1;
+    padding: 8px;
+    border: #279AF1;
+    border-radius: 21px;
+    width:20%;
+    margin: 5px 5px 10px 5px;
+}
+
+.saveAccountButton:hover{
+    background-color: #217abe;
+}
+
+.passwordAlert {
+    font-weight: 300;
+}

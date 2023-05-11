@@ -4,10 +4,28 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config()
 const bcrypt = require('bcrypt');
+const twilio = require('twilio')(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
+const nodemailer = require('nodemailer');
 
 const saltRounds = 10;
 const PORT = 3001;
-var dbConnected = false;
+var dbConnected = false
+const NOTIFY_INTERVAL_MS = 30000;
+var timeLastNotified = getDateTime();
+
+const phoneNumberRegex = /^\(?[0-9]{3}\)?\s?[0-9]{3}[\-\s]?[0-9]{4}/;
+const stripPhoneNumber = /[^0-9]/ig;
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        type: 'OAuth2',
+        user: process.env.GMAIL_EMAIL,
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+    }
+});
 
 const app = express();
 app.use(cors());
@@ -44,17 +62,78 @@ async function dbConnect() {
     }
 }
 
-const padNum = (num, n) => {
+function padNum(num, n) {
     return '0'.repeat(n - (num+'').length)+num
 }
 
-const getDateTime = () => {
+function getDateTime() {
     let now = new Date();
     return `${now.getFullYear()}-${padNum(now.getMonth() + 1, 2)}-${padNum(now.getDate(), 2)} ${padNum(now.getHours(), 2)}:${padNum(now.getMinutes(), 2)}:${padNum(now.getSeconds(), 2)}.${padNum(now.getMilliseconds(), 3)}`
 }
 
+async function notifyUsers() {
+    console.log(`Starting notifyUsers at ${getDateTime()}`)
+    let result = await sql.query`select header, date, county from Incidents
+    where date > ${timeLastNotified} and county not in ('null', 'NULL', 'N/A', '*N/A*')`;
+    let newIncidents = result.recordset;
+
+    result = await sql.query`select username, email, name as county, notificationStyle from Users join Counties on Users.userID = Counties.userId`
+    let usersJoinCounties = result.recordset;
+
+    for(const userRow of usersJoinCounties) {
+        let notifyStyle = userRow.notificationStyle;
+        if(notifyStyle == null) {
+            continue;
+        }
+        for(const incidentRow of newIncidents) {
+            let splitCounties = incidentRow.county.split(', ');
+            for(const s of splitCounties) {
+                if(s.includes(userRow.county)) {
+                    if(notifyStyle.inlcudes('phone')) {
+                        console.log(`Sending notification to ${userRow.username} with phoneNumber: ${userRow.phoneNUmber}:\n\t${incidentRow.header}\n\tin ${userRow.county}`);
+                        twilio.messages.create({
+                            body: `ALERT! ${incidentRow.header}\nLocation: ${s}${s.includes('County') ? "" : " County"}`,
+                            to: '+1'+userRow.phoneNumber,
+                            from: process.env.TWILIO_PHONE_NUMBER,
+                        }).then((message) => console.log(message.sid));
+                    }
+                    
+                    if(notifyStyle.includes('email')) {
+                        console.log(`Sending notification to ${userRow.username} with email: ${userRow.email}:\n\t${incidentRow.header}\n\tin ${userRow.county}`);
+                        transporter.sendMail({
+                            from: process.env.DEV_EMAIL,
+                            to: userRow.email,
+                            subject: 'Guardian Notification',
+                            text: `ALERT! ${incidentRow.header}\nLocation: ${s}${s.includes('County') ? "" : " County"}`,
+                        }, (error, info) => {
+                            if(error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+
+    timeLastNotified = getDateTime();
+    console.log(`Ending notifyUsers at ${timeLastNotified}`);
+
+
+}
+
+setInterval(notifyUsers, NOTIFY_INTERVAL_MS);
+
 
 // Routes
+
+app.get('/getNotificationStyle/:id', async (req, res) => {
+    let result = await sql.query`select notificationStyle from Users where userID=${parseInt(req.params.id)}`;
+    res.send(result.recordset[0]);
+});
 
 app.get("/incidents", async (req, res) => {
     let result = await sql.query`SELECT * FROM Incidents`;
@@ -115,7 +194,6 @@ app.get("/getwatchlist/:id", async (req, res) => {
     let result = await sql.query`SELECT IncidentId FROM Watching WHERE UserId = ${req.params.id}`;
     console.log(result.recordset.length,"LENGTH")
     if(result.recordset.length===0){
-        console.log("WHAT IS WE DOING")
         res.send("NO RECORDS")
     }
     else{
@@ -172,10 +250,51 @@ app.get('/deleteCounty/:userId/:county', async (req, res) => {
             return;
         });
     res.sendStatus(200);
-}); 
+});
+
+app.post('/editAccount', async (req, res) => {
+    let result = await sql.query`select password from Users where userID = ${req.body.id}`;
+    if(await !bcrypt.compareSync(req.body.password, result.recordset[0].password)) {
+        res.sendStatus(401);
+        return;
+    }
+
+    console.log(req.body.notificationStyle);
+    result = await sql.query`update Users set notificationStyle=${req.body.notificationStyle} where userID=${req.body.id}`;
+
+    if(!req.body.email && !req.body.number) {
+        res.sendStatus(400);
+        return;
+    }
+    
+
+    result = await sql.query`select count(*) from Users where email=${req.body.email}`;
+    if(req.body.email && result.recordset[0][''] != 0) {
+        res.sendStatus(400);
+        return;
+    }
+    
+    if(req.body.number && !phoneNumberRegex.test(req.body.number)) {
+        res.sendStatus(400);
+        return;
+    }
+
+    if(req.body.email && req.body.number) {
+        console.log('updating both...');
+        result = await sql.query`update Users set email=${req.body.email}, phoneNumber=${req.body.number.replaceAll(stripPhoneNumber, '')} where userID=${req.body.id}`;
+        res.sendStatus(200);
+    } else if(req.body.email && !req.body.number) {
+        console.log('updating only email...');
+        result = await sql.query`update Users set email=${req.body.email} where userID=${req.body.id}`;
+        res.sendStatus(200);
+    } else if(!req.body.email && req.body.number) {
+        console.log('updating only number...');
+        result = await sql.query`update Users set phoneNumber=${req.body.number.replaceAll(stripPhoneNumber, '')} where userID=${req.body.id}`;
+        res.sendStatus(200);
+    }
+});
 
 app.post('/signup', async (req, res) => {
-    console.log(req.body);
     if(req.body.username == undefined || req.body.password == undefined) {
         res.status(400).send({status: 'failure', message: 'Username or password empty'});
         return;
