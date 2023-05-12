@@ -176,15 +176,14 @@ app.post("/addsubscription/:id/:tag",async (req,res)=>{
     console.log(req.params.id)
     let result = await sql.query`insert into Subscriptions (userID,tagID) values (${req.params.id},${req.params.tag})`;
     res.sendStatus(200);
-})
+});
 app.get("/popular", async (req, res) => {
-    let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY watching DESC`;
-    //console.log(result.recordset);
+    let result = await sql.query`select top 100 *, (select count(*) from Comments where Comments.incidentID = Incidents.incidentID) as numComments, (select count(*) from Watching where Watching.incidentID = Incidents.incidentID) as numWatching from Incidents order by numWatching, numComments desc`;
     res.send(result.recordset);
 });
 
 app.get("/latest", async (req, res) => {
-    let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY incidentID DESC`;
+    let result = await sql.query`select top 100 *, (select count(*) from Comments where Comments.incidentID = Incidents.incidentID) as numComments, (select count(*) from Watching where Watching.incidentID = Incidents.incidentID) as numWatching from Incidents order by incidentID desc`;
     //console.log(result.recordset)
     res.send(result.recordset);
 });

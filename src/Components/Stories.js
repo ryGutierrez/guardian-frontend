@@ -134,12 +134,14 @@ export default function Stories(props) {
     
     //story class
     class story {
-        constructor(date,title,details,tag,id,watching) {
+        constructor(date,title,details,tag,id,watching,numWatching,numComments) {
             this.date = date
             this.title = title
             this.details = details
             this.tag = tag
             this.watching = watching
+            this.numWatching = numWatching;
+            this.numComments = numComments;
             if(tag === "fire"){
                 this.tag=faFire
             }
@@ -186,11 +188,11 @@ export default function Stories(props) {
     //It gets the stories from the stories array
     //returnStories function is being used by the second return statement.
     //1. we need to load stories from the database and put them into an array and pass the array into this function
-    function returnStories(story){
-        const tagsDone = ()=>{
+    function returnStories(story) {
+        const tagsDone = () => {
             setCheck(checkUserDone*-1)
         }
-        const subToTag = (e)=>{
+        const subToTag = (e) => {
             console.log(e.target)
             if(e.target.className === "tagButtonSelected"){
                 axios.post('/removesubscription/'+localStorage.getItem('userID')+"/"+e.target.id)
@@ -288,16 +290,16 @@ export default function Stories(props) {
                             <div className="interactions">
                                 <div id = {"comment"+s.id} className="action" onClick={() => { setCurr(s); toggleComments(s.id);}}>
                                     <FontAwesomeIcon className="icon" icon={faComment}/>
-                                    <p>1289</p>
+                                    <p>{s.numComments}</p>
                                 </div>
                                 <div id = {"watching"+s.id} className="action" onClick={(e)=>interaction(e,s.id)}>
                                     <FontAwesomeIcon className="icon" icon={faBinoculars} />
-                                    <p>1289</p>
+                                    <p>{s.numWatching}</p>
                                 </div>
-                                <div id = "share" className = "action">
+                                {/* <div id = "share" className = "action">
                                     <FontAwesomeIcon icon={faShare} />
                                     <p>1289</p>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     )
@@ -319,7 +321,7 @@ export default function Stories(props) {
                     for(let i = 0; i<response.data.length;i++){
                      let s = response.data[i]
                      s.date=moment(s.date).utc().format('YYYY-MM-DD')
-                     stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
+                     stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false,s.numWatching,s.numComments))
                      // console.log(response.data[i].details)
                     }
                     setnewUser(false)
@@ -336,7 +338,7 @@ export default function Stories(props) {
                for(let i = 0; i<response.data.length;i++){
                 let s = response.data[i]
                 s.date=moment(s.date).utc().format('YYYY-MM-DD')
-                stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
+                stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false,s.numWatching,s.numComments))
                 // console.log(response.data[i].details)
                }
                setCurr(stories[0]);
@@ -344,7 +346,7 @@ export default function Stories(props) {
             //    console.log(response.data)
             })
         }
-        console.log("Stories component loaded...");       
+        console.log("Stories component loaded...");
       
       }, [currTab,checkUserDone]);
 
