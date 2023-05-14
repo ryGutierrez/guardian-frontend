@@ -125,7 +125,7 @@ async function notifyUsers() {
 
 }
 
-setInterval(notifyUsers, NOTIFY_INTERVAL_MS);
+// setInterval(notifyUsers, NOTIFY_INTERVAL_MS);
 
 
 // Routes
@@ -177,16 +177,33 @@ app.post("/addsubscription/:id/:tag",async (req,res)=>{
     let result = await sql.query`insert into Subscriptions (userID,tagID) values (${req.params.id},${req.params.tag})`;
     res.sendStatus(200);
 })
-app.get("/popular", async (req, res) => {
-    let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY watching DESC`;
+app.get("/popular/:county", async (req, res) => {
+    console.log(req.params.county,"COUNTy")
+    if(req.params.county==="ANY"){
+        let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY watching DESC`;
+        res.send(result.recordset);
+        return
+    }
+    else{
+        let result = await sql.query`SELECT TOP 100 * FROM Incidents WHERE county = ${req.params.county} ORDER BY watching DESC`;
+        res.send(result.recordset);
+        return
+    }
     //console.log(result.recordset);
-    res.send(result.recordset);
 });
 
-app.get("/latest", async (req, res) => {
-    let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY incidentID DESC`;
+app.get("/latest/:county", async (req, res) => {
+    if(req.params.county==="ANY"){
+        let result = await sql.query`SELECT TOP 100 * FROM Incidents ORDER BY incidentID DESC`;
+        res.send(result.recordset);
+        return
+    }
+    else{
+        let result = await sql.query`SELECT TOP 100 * FROM Incidents WHERE county = ${req.params.county} ORDER BY incidentID DESC`;
+        res.send(result.recordset);
+        return
+    }
     //console.log(result.recordset)
-    res.send(result.recordset);
 });
 
 app.get("/getwatchlist/:id", async (req, res) => {
@@ -200,6 +217,20 @@ app.get("/getwatchlist/:id", async (req, res) => {
         res.send(result.recordset);
     }
 });
+app.post("/getPastStory", async (req,res)=>{
+    console.log(req.body.storyTitle,"TITLE")
+    let result = await sql.query`SELECT * FROM Incidents WHERE header=(${req.body.storyTitle}) ORDER BY incidentID DESC`;
+    console.log(result.recordset[0],"RECORD")
+    if(result.recordset.length>0){
+        res.status(200).send({status: 'success', pastStory: result.recordset});
+        return
+    }
+    else{
+        res.sendStatus(500)
+        return
+    }
+    // res.send(result.recordset)
+})
 app.get("/getStory/:id", async (req,res)=>{
     // console.log(req.params.id.slice(1,req.params.id.length-1),"REQID")
     const idList = JSON.parse(req.params.id)
@@ -209,6 +240,7 @@ app.get("/getStory/:id", async (req,res)=>{
     res.send(result.recordset)
 })
 app.post('/removewatching/:id/:userid', async (req, res) => {
+    let res2 = await sql.query`UPDATE Incidents SET watching = watching - 1 where incidentID = ${req.body.storyID}`
     console.log(req.params.id,req.params.userid,)
     let result = await sql.query`DELETE FROM Watching WHERE UserId = ${req.params.userid} AND incidentId=${req.params.id}`;
     console.log(result)
@@ -216,6 +248,7 @@ app.post('/removewatching/:id/:userid', async (req, res) => {
 });
 
 app.post('/watching', async (req, res) => {
+    let res2 = await sql.query`UPDATE Incidents SET watching = watching + 1 where incidentID = ${req.body.storyID}`
     console.log(req.body.username)
     let result = await sql.query`insert into Watching (UserId, incidentId) values (${req.body.userID}, ${req.body.storyID})`;
     console.log(result,"watching")

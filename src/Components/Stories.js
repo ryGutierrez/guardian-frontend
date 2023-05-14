@@ -5,7 +5,7 @@ import StickyBox from "react-sticky-box";
 import SideStories from './SideStories';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare,faTrafficLight,faPersonDigging,faCloudBolt, faHeartCircleCheck, faXmark} from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faFire,faComment, faHouseFloodWater,faBinoculars,faShare,faTrafficLight,faPersonDigging,faCloudBolt, faHeartCircleCheck, faXmark,faTriangleExclamation,faCarBurst} from '@fortawesome/free-solid-svg-icons'
 import moment from "moment"
 import Modal from "react-modal";
 import { isCompositeComponent } from 'react-dom/test-utils';
@@ -23,7 +23,11 @@ export default function Stories(props) {
 
     // Reference variables
     const inputRef = useRef();
-
+    console.log(props.county,"COUNTY")
+    let county = props.county
+    if(props.county==null){
+        county = "ANY"
+    }
     //Story Tabs {Latest, Popular, Mine}
     if(props.loadSideView!=null){
         console.log(props.loadSideView,"Stories LOADING PROPS SIDE")
@@ -140,24 +144,35 @@ export default function Stories(props) {
             this.details = details
             this.tag = tag
             this.watching = watching
-            if(tag === "fire"){
+            if(tag == null){
+                tag = this.title
+            }
+            if(tag == "Fire"){
                 this.tag=faFire
             }
             else if(tag === "flood"){
                 this.tag=faHouseFloodWater
             }
-            this.id = id
-            this.shortenedDetails = details
-            this.hideBtn = true
-            if(this.details.length>=150){
-                this.shortenedDetails=this.details.substring(0,150)+"...";
-                this.hideBtn = false
+            else if(tag.includes("DROUGHT") || tag.includes("ROAD/WEATHER")){
+                this.tag = faCloudBolt
             }
-            if(tag === "fire"){
+            else if(tag.includes("Trfc") || tag.includes("Traffic") || this.title.includes("Traffic")){
+                this.tag = faTrafficLight
+            }
+            else if(tag.includes("CLOSURE")){
+                this.tag = faXmark
+            }
+            else if(tag.includes("Construction") || this.title.includes("Construction")){
+                this.tag = faPersonDigging
+            }
+            else if(tag.includes("Hazard") || this.title.includes("Hazard")){
+                this.tag = faTriangleExclamation
+            }
+            else if(tag.includes("Hit and Run") || this.title.includes("Hit and Run")){
+                this.tag = faCarBurst
+            }
+            else{
                 this.tag=faFire
-            }
-            else if(tag === "flood"){
-                this.tag=faHouseFloodWater
             }
             this.id = id
             this.shortenedDetails = details
@@ -237,6 +252,7 @@ export default function Stories(props) {
             console.log(e.target.getAttribute('id'))
             // e.target.getAttribute('id')
             if(e.target.id === "watching-inter"){
+                document.getElementById("watchingNum"+id).innerHTML = parseInt(document.getElementById("watchingNum"+id).innerHTML)-1
                 e.target.id = "watching"
                 console.log("REMOVE WATCHING",localStorage.getItem("user"))
                 let response = await fetch('/removewatching', { // send username and incident id through POST body.
@@ -251,6 +267,7 @@ export default function Stories(props) {
               });
             }
             else{
+                document.getElementById("watchingNum"+id).innerHTML = parseInt(document.getElementById("watchingNum"+id).innerHTML)+1
                 e.target.id = "watching-inter"
                 console.log("ADD TO WATCHLIST FUNCTION")
                 props.addToWatchlist(id)
@@ -292,7 +309,7 @@ export default function Stories(props) {
                                 </div>
                                 <div id = {"watching"+s.id} className="action" onClick={(e)=>interaction(e,s.id)}>
                                     <FontAwesomeIcon className="icon" icon={faBinoculars} />
-                                    <p>1289</p>
+                                    <p id = {"watchingNum"+s.id}>{s.watching}</p>
                                 </div>
                                 <div id = "share" className = "action">
                                     <FontAwesomeIcon icon={faShare} />
@@ -319,7 +336,7 @@ export default function Stories(props) {
                     for(let i = 0; i<response.data.length;i++){
                      let s = response.data[i]
                      s.date=moment(s.date).utc().format('YYYY-MM-DD')
-                     stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
+                     stories.push(new story(s.date,s.header,s.content,s.tag,s.incidentID,s.watching))
                      // console.log(response.data[i].details)
                     }
                     setnewUser(false)
@@ -330,13 +347,13 @@ export default function Stories(props) {
             })
         }
         else{
-            axios.get('/'+currTab)
+            axios.get('/'+currTab+'/'+county)
             .then((response) => {
                let stories = []
                for(let i = 0; i<response.data.length;i++){
                 let s = response.data[i]
                 s.date=moment(s.date).utc().format('YYYY-MM-DD')
-                stories.push(new story(s.date,s.header,s.content,"fire",s.incidentID,false))
+                stories.push(new story(s.date,s.header,s.content,s.tag,s.incidentID,s.watching))
                 // console.log(response.data[i].details)
                }
                setCurr(stories[0]);
@@ -346,7 +363,7 @@ export default function Stories(props) {
         }
         console.log("Stories component loaded...");       
       
-      }, [currTab,checkUserDone]);
+      }, [currTab,checkUserDone,props.county]);
 
     return (
         <div className = "MainWindow">
@@ -428,3 +445,4 @@ export default function Stories(props) {
   )
   
 }
+

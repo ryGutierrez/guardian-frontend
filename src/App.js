@@ -218,7 +218,7 @@ function App() {
           </div>
         </StickyBox>
         <div className="AppStories">
-          <Stories addToWatchlist={toggleWatchList} loadSideView={sideView}/>
+          <Stories addToWatchlist={toggleWatchList} loadSideView={sideView} county = {currCounty}/>
         </div>
       </div>
     </div>
