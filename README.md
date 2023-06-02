@@ -1,6 +1,6 @@
 # Guardian Project
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). An express server is located in the `server` directory.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). An express server is located in the `server` directory. The backend repository for this application can be found [here](https://github.com/IGramajoO/CSUMB_Guardian_Backend).
 
 ## Running the application
 
